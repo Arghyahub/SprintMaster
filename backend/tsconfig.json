@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    // "target": "ES6",
+    "typeRoots": ["src/types", "./node_modules/@types"],
+    "target": "ES2022",
+    // "module": "commonjs",
+    "module": "NodeNext",
+    "rootDir": "./src",
+    // "moduleResolution": "node",
+    "moduleResolution": "NodeNext",
+    "outDir": "./dist",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": false,
+    "skipLibCheck": true
+  },
+  "include": ["./src/**/*","./src/types/**/*"],
+}
