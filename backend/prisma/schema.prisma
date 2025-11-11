@@ -28,14 +28,15 @@ enum UserTypeEnum {
 // }
 
 model User {
-  id             Int          @id @default(autoincrement())
-  name           String
-  email          String       @unique
-  password       String
-  user_type      UserTypeEnum
-  access_role_id Int
+  id                   Int          @id @default(autoincrement())
+  name                 String
+  email                String       @unique
+  password             String
+  user_type            UserTypeEnum
+  access_role_id       Int
   // status              UserStatus          @default(in_review)
-
+  company_id           Int?
+  company              Company?     @relation(fields: [company_id], references: [id])
   access_role          AccessRole   @relation(fields: [access_role_id], references: [id], name: "user")
   updated_access_roles AccessRole[]
 }
@@ -51,4 +52,24 @@ model AccessRole {
   updated_by_user User?        @relation(fields: [updated_by_id], references: [id])
   updated_at      DateTime     @default(dbgenerated("now()"))
   users           User[]       @relation("user")
+}
+
+enum BoardForType {
+  development
+  marketing
+  sales
+  hr
+  design
+  customer_support
+  custom
+}
+
+model Company {
+  id           Int      @id @default(autoincrement())
+  name         String
+  company_size Int?
+  industry     String?
+  created_at   DateTime @default(dbgenerated("now()"))
+  updated_at   DateTime @default(dbgenerated("now()"))
+  users        User[]
 }

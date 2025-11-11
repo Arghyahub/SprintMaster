@@ -64,7 +64,7 @@ async function signUp(req: Request, res: Response) {
         name: name.trim(),
         email: email.trim().toLowerCase(),
         password: hashedPasswd,
-        user_type: "employee",
+        user_type: "manager",
         access_role_id: ownerAccessRole.id,
       },
     });

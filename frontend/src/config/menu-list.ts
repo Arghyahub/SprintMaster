@@ -1,5 +1,12 @@
 import { JSX } from "react";
-import { House, ScanFace, User, UserStar } from "lucide-react";
+import {
+  BriefcaseBusiness,
+  House,
+  ScanFace,
+  Settings,
+  User,
+  UserStar,
+} from "lucide-react";
 import config from "./config";
 import { RoleEntity } from "@/types/entities/role-entity";
 
@@ -141,6 +148,22 @@ class MenuUtil {
           title: "Role",
           icon: ScanFace,
           path: "/home/super-admin/role",
+          access: ["access", "add", "edit"],
+        },
+      ],
+    },
+    // Company Setup
+    {
+      id: 4,
+      title: "Company",
+      type: "parent",
+      icon: BriefcaseBusiness,
+      children: [
+        {
+          id: 5,
+          title: "Setup",
+          icon: Settings,
+          path: "/home/company/setup",
           access: ["access", "add", "edit"],
         },
       ],

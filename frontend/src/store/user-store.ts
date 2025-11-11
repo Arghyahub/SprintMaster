@@ -8,6 +8,7 @@ interface UserStore {
     email: string;
     user_type: string;
     access_role: AccessRoleEntity;
+    company_id?: number;
   };
   setUser: (user: UserStore["user"]) => void;
   getRolePermissions: (pageNumber: number) => RoleRowType;

@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import SplashScreen from "./splash-screen";
 import useUserStore from "@/store/user-store";
 import UserEntity from "@/types/entities/user-entity";
+import Util from "@/utils/util";
 type Props = {
   children: React.ReactNode;
 };
@@ -31,6 +32,16 @@ const Protected = ({ children }: Props) => {
         if (payload && payload.user) {
           setAccessToken(payload.accessToken);
           Api.setAccessToken(payload.accessToken);
+          if (
+            !Util.isNotNull(payload?.user?.company_id) &&
+            payload.user.user_type !== "super_admin"
+          ) {
+            router.replace("/home/company/setup");
+            payload.user.access_role.role = {
+              4: { access: true },
+              5: { access: true, add: true, edit: true },
+            };
+          }
           setUser(payload.user);
         }
       } else {
