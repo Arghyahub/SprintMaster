@@ -42,6 +42,7 @@ const Protected = ({ children }: Props) => {
               5: { access: true, add: true, edit: true },
             };
           }
+          console.log(payload.user);
           setUser(payload.user);
         }
       } else {

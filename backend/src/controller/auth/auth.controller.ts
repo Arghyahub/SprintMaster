@@ -39,7 +39,7 @@ async function signUp(req: Request, res: Response) {
 
     const ownerAccessRole = await prisma.accessRole.findFirst({
       where: {
-        for_type: "employee",
+        for_type: "manager",
         is_master: true,
       },
       orderBy: {

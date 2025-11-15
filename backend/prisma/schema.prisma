@@ -68,7 +68,7 @@ model Company {
   id           Int      @id @default(autoincrement())
   name         String
   company_size Int?
-  industry     String?
+  about        String?
   created_at   DateTime @default(dbgenerated("now()"))
   updated_at   DateTime @default(dbgenerated("now()"))
   users        User[]

@@ -160,7 +160,7 @@ const page = (props: Props) => {
         <h1 className="mb-2 font-semibold text-2xl">Roles</h1>
         {permissions?.add && (
           <VariantBtn
-            text="Add"
+            label="Add"
             onClick={() => router.push("/home/super-admin/role/add-update")}
           />
         )}

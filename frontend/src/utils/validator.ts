@@ -9,7 +9,7 @@ type numericInputParam = {
 };
 
 interface numericInputReturn {
-  breakInput: boolean;
+  breakOnchange: boolean;
   isValid: boolean;
   error: string;
 }
@@ -50,7 +50,7 @@ class Validator {
   /**
    * Thus 3 thing, if number is valid, should you allow user to type and what's the error to be shown
    */
-  static isValidNumericInput({
+  static #isValidNumericInput({
     value,
     decimal = 0, // If decimal = 0, then decimal is not allowed
     required = false,
@@ -60,13 +60,13 @@ class Validator {
     const emptyError = required ? "Field cannot be empty" : "";
     if (typeof value == "number") value = value.toString();
     if (typeof value !== "string")
-      return { breakInput: true, isValid: false, error: "" };
+      return { breakOnchange: true, isValid: false, error: "" };
     const trimmedValue = value.trim();
     if (trimmedValue === "")
-      return { breakInput: false, isValid: !required, error: emptyError };
+      return { breakOnchange: false, isValid: !required, error: emptyError };
     if (trimmedValue == "-")
       return {
-        breakInput: false,
+        breakOnchange: false,
         isValid: false,
         error: "",
       };
@@ -74,55 +74,56 @@ class Validator {
     const num = Number(trimmedValue);
 
     if (Number.isNaN(num))
-      return { breakInput: true, isValid: false, error: "" };
+      return { breakOnchange: true, isValid: false, error: "" };
 
     if (Util.isNotNull(max) && Util.isNotNull(min)) {
       if (num < min || num > max)
-        return { breakInput: true, isValid: false, error: "" };
+        return { breakOnchange: true, isValid: false, error: "" };
     } else if (Util.isNotNull(max)) {
-      if (num > max) return { breakInput: true, isValid: false, error: "" };
+      if (num > max) return { breakOnchange: true, isValid: false, error: "" };
     } else if (Util.isNotNull(min)) {
-      // say min is 5 and person wants to write 10, If I stop him at 1, he wouldn't be able to write thus breakInput: false
+      // say min is 5 and person wants to write 10, If I stop him at 1, he wouldn't be able to write thus breakOnchange: false
       if (num < min)
         return {
-          breakInput: false,
+          breakOnchange: false,
           isValid: false,
           error: `Number entered is lower than minimum value ${min}`,
         };
     }
 
     if (trimmedValue.includes(".")) {
-      if (decimal == 0) return { breakInput: true, isValid: false, error: "" };
+      if (decimal == 0)
+        return { breakOnchange: true, isValid: false, error: "" };
       const decimalParts = trimmedValue.split(".");
       const integerPart = decimalParts[0];
       const decimalPart = decimalParts[1];
 
       if (integerPart?.length == 0)
-        return { breakInput: true, isValid: false, error: "" };
+        return { breakOnchange: true, isValid: false, error: "" };
       if (decimalPart?.length > decimal)
-        return { breakInput: true, isValid: false, error: "" };
+        return { breakOnchange: true, isValid: false, error: "" };
       if (decimalPart?.length == 0)
-        return { breakInput: false, isValid: false, error: "" };
+        return { breakOnchange: false, isValid: false, error: "" };
     }
 
-    return { breakInput: false, isValid: true, error: "" };
+    return { breakOnchange: false, isValid: true, error: "" };
   }
 
   /**
    * **From Db** - Check *isValid* else replace to empty
    *
-   * **On Change** - Check *breakInput* and return else set *error*
+   * **On Change** - Check *breakOnchange* and stop execution else set *error*
    *
    * **On Submit** - Check *isValid*, if not set *error* or *Invalid Input* and return
    */
   static getNumericValidator({
-    decimal = 2,
+    decimal = 0,
     required = false,
     min,
     max,
   }: numericInputGeneratorType) {
     return (value: string | number) => {
-      return this.isValidNumericInput({ value, required, decimal, max, min });
+      return this.#isValidNumericInput({ value, required, decimal, max, min });
     };
   }
 }

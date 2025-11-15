@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Info } from "lucide-react";
-import React, { memo } from "react";
+import React, { memo, TextareaHTMLAttributes } from "react";
 import { Tooltip } from "react-tooltip";
 
 type ErrorIdReq =
@@ -12,18 +12,23 @@ type Props = {
   placeholder?: string;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  type?: React.HTMLInputTypeAttribute;
+  type?: React.HTMLInputTypeAttribute | "text-area";
   className?: string;
+  layoutClassName?: string;
   // error?: string;
   name?: string;
   // id?: string;
   maxLength?: number;
   SuffixIcon?: React.JSX.Element;
+  additionalProps?:
+    | TextareaHTMLAttributes<HTMLTextAreaElement>
+    | React.InputHTMLAttributes<HTMLInputElement>;
 } & ErrorIdReq;
 
 const AdvInput = ({
   label,
   className = "",
+  layoutClassName = "",
   onChange,
   placeholder,
   type = "text",
@@ -33,9 +38,10 @@ const AdvInput = ({
   id,
   SuffixIcon,
   maxLength = 250,
+  additionalProps = {},
 }: Props) => {
   return (
-    <div className={"flex flex-col gap-1"}>
+    <div className={cn("flex flex-col gap-1", layoutClassName)}>
       <div className="flex flex-row min-h-4">
         {label && <label className="font-medium text-md">{label}</label>}
         {error && error !== "" && (
@@ -58,21 +64,49 @@ const AdvInput = ({
           </>
         )}
       </div>
-      <div className="flex flex-row">
-        <input
-          type={type}
-          placeholder={placeholder}
-          value={value}
-          onChange={onChange}
-          name={name}
-          id={id}
-          maxLength={maxLength}
-          className={cn(
-            "p-2 border border-slate-300 rounded w-full",
-            { "border-r-0 rounded-r-none": !!SuffixIcon },
-            className
-          )}
-        />
+      <div className="flex flex-row w-full">
+        {type == "text-area" ? (
+          <textarea
+            placeholder={placeholder}
+            value={value}
+            onChange={(e) => onChange(e as any)}
+            name={name}
+            id={id}
+            onWheel={(e) => {
+              if (type === "number") {
+                (e.target as HTMLElement).blur();
+              }
+            }}
+            maxLength={maxLength}
+            className={cn(
+              "p-2 border border-slate-300 rounded w-full",
+              { "border-r-0 rounded-r-none": !!SuffixIcon },
+              className
+            )}
+            {...(additionalProps as any)}
+          />
+        ) : (
+          <input
+            type={type}
+            placeholder={placeholder}
+            value={value}
+            onChange={onChange}
+            name={name}
+            id={id}
+            onWheel={(e) => {
+              if (type === "number") {
+                (e.target as HTMLElement).blur();
+              }
+            }}
+            maxLength={maxLength}
+            className={cn(
+              "p-2 border border-slate-300 rounded w-full",
+              { "border-r-0 rounded-r-none": !!SuffixIcon },
+              className
+            )}
+            {...(additionalProps as any)}
+          />
+        )}
         {SuffixIcon && (
           <div className="flex justify-center items-center border-y border-r border-l-0 rounded h-full aspect-square">
             {SuffixIcon}

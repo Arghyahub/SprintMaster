@@ -1,3 +1,4 @@
+import CompanyEntity from "./company-entity";
 import RoleEntity from "./role-entity";
 
 export type UserTypeEntity = "admin" | "owner" | "employee" | "super_admin";
