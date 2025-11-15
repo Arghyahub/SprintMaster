@@ -1,3 +1,4 @@
+"use client";
 import { JSX } from "react";
 import {
   BriefcaseBusiness,
@@ -64,10 +65,12 @@ class MenuUtil {
     access_role: RoleEntity,
     currentPath?: string
   ): (MenuItem & { is_open?: boolean })[] {
+    const CompleteMenuItems = this.cloneMenuItems();
     if (!this.role_access_enabled) {
-      return this.MenuItems;
+      return CompleteMenuItems;
     }
-    const newMenuList = this.MenuItems.filter((menu) => {
+
+    const newMenuList = CompleteMenuItems.filter((menu) => {
       if (!access_role?.[menu.id]?.access && menu.type == "link") return false;
       if (menu.type == "link") return true;
       menu.children = menu.children.filter((child) => {
@@ -88,8 +91,12 @@ class MenuUtil {
     return newMenuList;
   }
 
-  static getSelectables(menuItems = MenuUtil.MenuItems) {
-    return menuItems.map((menu) => {
+  static getSelectables(menuItems?: typeof MenuUtil.MenuItems) {
+    if (!menuItems) {
+      menuItems = this.cloneMenuItems();
+    }
+
+    const selectables = menuItems.map((menu) => {
       if (menu.type == "link") {
         return {
           id: menu.id,
@@ -118,6 +125,23 @@ class MenuUtil {
         };
       }
     });
+    return selectables;
+  }
+
+  static cloneMenuItems(): typeof MenuUtil.MenuItems {
+    return MenuUtil.MenuItems.map((menu) => {
+      if (menu.type == "link") {
+        return { ...menu, access: [...menu.access] };
+      } else {
+        return {
+          ...menu,
+          children: menu.children.map((child) => ({
+            ...child,
+            access: [...child.access],
+          })),
+        };
+      }
+    });
   }
 
   static MenuItems: MenuItem[] = [
@@ -127,7 +151,13 @@ class MenuUtil {
       icon: House,
       type: "link",
       path: "/home",
-      access: ["access", "super_admin"],
+      access: [
+        "access",
+        "board_management",
+        "user_management",
+        "pending_tasks",
+        "analytics",
+      ],
     },
     // Super Admin is Number 1.
     {
