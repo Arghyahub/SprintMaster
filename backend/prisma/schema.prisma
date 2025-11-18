@@ -28,17 +28,22 @@ enum UserTypeEnum {
 // }
 
 model User {
-  id                   Int          @id @default(autoincrement())
+  id                   Int                 @id @default(autoincrement())
   name                 String
-  email                String       @unique
+  email                String              @unique
   password             String
   user_type            UserTypeEnum
   access_role_id       Int
   // status              UserStatus          @default(in_review)
   company_id           Int?
-  company              Company?     @relation(fields: [company_id], references: [id])
-  access_role          AccessRole   @relation(fields: [access_role_id], references: [id], name: "user")
+  company              Company?            @relation(fields: [company_id], references: [id])
+  access_role          AccessRole          @relation(fields: [access_role_id], references: [id], name: "user")
   updated_access_roles AccessRole[]
+  updated_boards       Board[]
+  assigned_tasks       Task[]              @relation(name: "assigned_tasks")
+  created_tasks        Task[]              @relation(name: "created_tasks")
+  tasks                Task[]              @relation(name: "updated_tasks")
+  relationUserBoards   RelationUserBoard[]
 }
 
 model AccessRole {
@@ -72,4 +77,55 @@ model Company {
   created_at   DateTime @default(dbgenerated("now()"))
   updated_at   DateTime @default(dbgenerated("now()"))
   users        User[]
+  boards       Board[]
+}
+
+enum BoardStatus {
+  awaiting
+  in_progress
+  complete
+}
+
+model RelationUserBoard {
+  id       Int   @id @default(autoincrement())
+  user_id  Int
+  board_id Int
+  user     User  @relation(fields: [user_id], references: [id])
+  board    Board @relation(fields: [board_id], references: [id])
+}
+
+model Board {
+  id                 Int                 @id @default(autoincrement())
+  name               String
+  start_date         DateTime
+  end_date           DateTime
+  status             BoardStatus         @default(awaiting)
+  stages             String[] // Last has to be done
+  company_id         Int
+  company            Company             @relation(fields: [company_id], references: [id])
+  created_at         DateTime            @default(dbgenerated("now()"))
+  updated_by_id      Int?
+  updated_by_user    User?               @relation(fields: [updated_by_id], references: [id])
+  updated_at         DateTime            @default(dbgenerated("now()"))
+  tasks              Task[]
+  relationUserBoards RelationUserBoard[]
+}
+
+model Task {
+  id               Int       @id @default(autoincrement())
+  name             String
+  description      String
+  stage_idx        Int       @default(0)
+  start_date       DateTime?
+  end_date         DateTime?
+  board_id         Int
+  board            Board     @relation(fields: [board_id], references: [id])
+  assigned_to_id   Int?
+  assigned_to_user User?     @relation("created_tasks", fields: [assigned_to_id], references: [id])
+  created_at       DateTime  @default(dbgenerated("now()"))
+  updated_at       DateTime  @default(dbgenerated("now()"))
+  created_by_id    Int
+  created_by_user  User      @relation("assigned_tasks", fields: [created_by_id], references: [id])
+  updated_by_id    Int?
+  updated_by_user  User?     @relation("updated_tasks", fields: [updated_by_id], references: [id])
 }

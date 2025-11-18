@@ -15,4 +15,6 @@ companyRouter.post(
   companyController.createOrUpdateCompany
 );
 
+companyRouter.get("/dashboard", companyController.getDashboardData);
+
 export default companyRouter;

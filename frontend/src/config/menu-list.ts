@@ -156,7 +156,7 @@ class MenuUtil {
         "board_management",
         "user_management",
         "pending_tasks",
-        "analytics",
+        // "analytics",
       ],
     },
     // Super Admin is Number 1.
