@@ -100,7 +100,6 @@ model Board {
   start_date         DateTime
   end_date           DateTime
   status             BoardStatus         @default(awaiting)
-  stages             String[] // Last has to be done
   company_id         Int
   company            Company             @relation(fields: [company_id], references: [id])
   created_at         DateTime            @default(dbgenerated("now()"))
@@ -109,23 +108,37 @@ model Board {
   updated_at         DateTime            @default(dbgenerated("now()"))
   tasks              Task[]
   relationUserBoards RelationUserBoard[]
+  boardStages        BoardStage[]
+}
+
+model BoardStage {
+  id       Int     @id @default(autoincrement())
+  board_id Int
+  order    Int
+  is_final Boolean @default(dbgenerated("false"))
+  name     String
+  board    Board   @relation(fields: [board_id], references: [id])
+  tasks    Task[]
+
+  @@unique([board_id, order])
 }
 
 model Task {
-  id               Int       @id @default(autoincrement())
+  id               Int        @id @default(autoincrement())
   name             String
   description      String
-  stage_idx        Int       @default(0)
+  stage_id         Int
+  board_stage      BoardStage @relation(fields: [stage_id], references: [id])
   start_date       DateTime?
   end_date         DateTime?
   board_id         Int
-  board            Board     @relation(fields: [board_id], references: [id])
+  board            Board      @relation(fields: [board_id], references: [id])
   assigned_to_id   Int?
-  assigned_to_user User?     @relation("created_tasks", fields: [assigned_to_id], references: [id])
-  created_at       DateTime  @default(dbgenerated("now()"))
-  updated_at       DateTime  @default(dbgenerated("now()"))
+  assigned_to_user User?      @relation("created_tasks", fields: [assigned_to_id], references: [id])
+  created_at       DateTime   @default(dbgenerated("now()"))
+  updated_at       DateTime   @default(dbgenerated("now()"))
   created_by_id    Int
-  created_by_user  User      @relation("assigned_tasks", fields: [created_by_id], references: [id])
+  created_by_user  User       @relation("assigned_tasks", fields: [created_by_id], references: [id])
   updated_by_id    Int?
-  updated_by_user  User?     @relation("updated_tasks", fields: [updated_by_id], references: [id])
+  updated_by_user  User?      @relation("updated_tasks", fields: [updated_by_id], references: [id])
 }

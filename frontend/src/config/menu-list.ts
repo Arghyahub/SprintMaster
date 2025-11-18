@@ -3,6 +3,7 @@ import { JSX } from "react";
 import {
   BriefcaseBusiness,
   House,
+  LayoutDashboard,
   ScanFace,
   Settings,
   User,
@@ -10,9 +11,6 @@ import {
 } from "lucide-react";
 import config from "./config";
 import { RoleEntity } from "@/types/entities/role-entity";
-
-// Update this variable to the last ID used in your menu items
-const lastId = 3 as const;
 
 export type ParentMenuItem = {
   type: "parent"; // Only used to show is menu, no real use
@@ -65,7 +63,7 @@ class MenuUtil {
     access_role: RoleEntity,
     currentPath?: string
   ): (MenuItem & { is_open?: boolean })[] {
-    const CompleteMenuItems = this.cloneMenuItems();
+    const CompleteMenuItems = MenuUtil.cloneMenuItems();
     if (!this.role_access_enabled) {
       return CompleteMenuItems;
     }
@@ -92,11 +90,12 @@ class MenuUtil {
   }
 
   static getSelectables(menuItems?: typeof MenuUtil.MenuItems) {
-    if (!menuItems) {
-      menuItems = this.cloneMenuItems();
+    let menuItemList = menuItems;
+    if (!menuItemList) {
+      menuItemList = MenuUtil.cloneMenuItems();
     }
 
-    const selectables = menuItems.map((menu) => {
+    const selectables = menuItemList.map((menu) => {
       if (menu.type == "link") {
         return {
           id: menu.id,
@@ -198,8 +197,18 @@ class MenuUtil {
         },
       ],
     },
+    {
+      id: 6,
+      title: "Board",
+      icon: LayoutDashboard,
+      type: "link",
+      path: "/home/board",
+      access: ["access", "add"],
+    },
   ] as const;
 }
+// Update this variable to the last ID used in your menu items
+const lastId = 6 as const;
 
 MenuUtil.validateUniqueIds();
 

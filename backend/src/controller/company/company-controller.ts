@@ -124,13 +124,13 @@ const getDashboardData = async (req: Request, res: Response) => {
       },
     });
 
-    const pending_tasks = await prisma.$queryRaw`
-      select * from "Board" b 
-      join "Task" t on b.id = t.board_id
-      where b.status = 'in_progress' and 
-      b.company_id = ${company?.id} and
-      t.stage_idx < (select array_length(b.stages, 1) - 1)
-    `;
+    // const pending_tasks = await prisma.$queryRaw`
+    //   select * from "Board" b
+    //   join "Task" t on b.id = t.board_id
+    //   where b.status = 'in_progress' and
+    //   b.company_id = ${company?.id} and
+    //   t.stage_idx < (select array_length(b.stages, 1) - 1)
+    // `;
 
     return Api.response({
       res,
@@ -139,7 +139,7 @@ const getDashboardData = async (req: Request, res: Response) => {
       payload: {
         board_management: board,
         user_management: users,
-        pending_tasks: pending_tasks,
+        pending_tasks: null,
       },
     });
   } catch (error) {
