@@ -14,7 +14,7 @@ class Api {
     status = 200,
     message,
     error,
-    payload = {},
+    payload,
   }: ApiResponse): void {
     res.status(status).json({
       message,

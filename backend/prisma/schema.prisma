@@ -59,16 +59,6 @@ model AccessRole {
   users           User[]       @relation("user")
 }
 
-enum BoardForType {
-  development
-  marketing
-  sales
-  hr
-  design
-  customer_support
-  custom
-}
-
 model Company {
   id           Int      @id @default(autoincrement())
   name         String
@@ -81,7 +71,7 @@ model Company {
 }
 
 enum BoardStatus {
-  awaiting
+  upcoming
   in_progress
   complete
 }
@@ -99,7 +89,7 @@ model Board {
   name               String
   start_date         DateTime
   end_date           DateTime
-  status             BoardStatus         @default(awaiting)
+  status             BoardStatus         @default(upcoming)
   company_id         Int
   company            Company             @relation(fields: [company_id], references: [id])
   created_at         DateTime            @default(dbgenerated("now()"))

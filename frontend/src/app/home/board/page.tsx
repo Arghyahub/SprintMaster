@@ -1,8 +1,11 @@
 "use client";
 import Loader from "@/components/common/loader";
+import VariantBtn from "@/components/common/varitant-btn";
 import useUserStore from "@/store/user-store";
+import BoardEntity from "@/types/entities/board=entity";
 import Api from "@/utils/api";
 import Util from "@/utils/util";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -12,12 +15,18 @@ type Props = {};
 const page = (props: Props) => {
   const permissions = useUserStore((state) => state.getRolePermissions(6));
   const [IsLoading, setIsLoading] = useState(false);
-  const [Data, setData] = useState([]);
+  const [Data, setData] = useState<BoardEntity[]>([]);
+  const router = useRouter();
 
   const fetchBoards = async () => {
     setIsLoading(true);
     try {
       const res = await Api.get("/board");
+      if (res.status == 500) {
+        toast.error(res.data.message ?? "Something went wrong");
+      } else if (res.status == 200 && res.data?.payload) {
+        setData(res.data.payload);
+      }
     } catch (err) {
       console.log(err);
       toast.error("Failed to fetch boards.");
@@ -38,8 +47,40 @@ const page = (props: Props) => {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-3xl">Boards</h1>
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-row justify-between w-full">
+        <h1 className="text-3xl">Boards</h1>
+        <VariantBtn
+          label="Create Board"
+          onClick={() => router.push("/home/board/add-update")}
+        />
+      </div>
+
+      {Data.length === 0 ? (
+        <p>No boards available. Create one today</p>
+      ) : (
+        <div className="flex flex-row flex-wrap gap-4 w-full h-full">
+          {Data.map((board) => (
+            <div
+              key={board.id}
+              className="flex flex-col gap-2 p-4 border rounded-lg"
+            >
+              <p>{board.name}</p>
+              <div className="border w-full"></div>
+              <div className="flex flex-row justify-between">
+                <p>Pending Tasks: </p>
+                <table>
+                  <tr>
+                    <td>{board?.pending_tasks ?? ""}</td>
+                    <td>/</td>
+                    <td>{board?.total_tasks ?? ""}</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

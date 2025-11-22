@@ -62,7 +62,10 @@ const AdvSelect = ({
       <div className="flex flex-row">
         <Select value={value} onValueChange={onChange}>
           <SelectTrigger
-            className={cn("border-slate-300 w-[180px] min-h-11", className)}
+            className={cn(
+              "border-slate-300 focus:outline-none ring-0 focus-visible:ring-0 focus:ring-0 focus:ring-transparent focus-visible:ring-offset-0 focus:ring-offset-0 min-w-[250px] min-h-11",
+              className
+            )}
           >
             <SelectValue placeholder={placeholder} />
           </SelectTrigger>

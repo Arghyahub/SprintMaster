@@ -23,6 +23,7 @@ type Props = {
   additionalProps?:
     | TextareaHTMLAttributes<HTMLTextAreaElement>
     | React.InputHTMLAttributes<HTMLInputElement>;
+  props?: any;
 } & ErrorIdReq;
 
 const AdvInput = ({
@@ -39,9 +40,10 @@ const AdvInput = ({
   SuffixIcon,
   maxLength = 250,
   additionalProps = {},
+  props,
 }: Props) => {
   return (
-    <div className={cn("flex flex-col gap-1", layoutClassName)}>
+    <div className={cn("flex flex-col gap-1 min-w-[250px]", layoutClassName)}>
       <div className="flex flex-row min-h-4">
         {label && <label className="font-medium text-md">{label}</label>}
         {error && error !== "" && (
@@ -87,6 +89,8 @@ const AdvInput = ({
           />
         ) : (
           <input
+            // {...props}
+            autoFocus={false}
             type={type}
             placeholder={placeholder}
             value={value}

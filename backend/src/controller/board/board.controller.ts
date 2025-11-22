@@ -4,7 +4,16 @@ import Api from "../../util/api";
 
 const getBoard = async (req: Request, res: Response) => {
   try {
-    const boards = await prisma.board.findMany();
+    const boards = await prisma.$queryRaw`
+    SELECT 
+      b.*,
+      COUNT(t.id) FILTER (WHERE bs.is_final = false) AS pending_tasks,
+      COUNT(t.id) AS total_tasks
+    FROM "Board" b
+    LEFT JOIN "BoardStage" bs ON b.id = bs.board_id
+    LEFT JOIN "Task" t ON bs.id = t.stage_id
+    GROUP BY b.id;
+    `;
 
     return Api.response({
       res,
