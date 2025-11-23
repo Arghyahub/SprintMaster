@@ -9,7 +9,7 @@ type Props = {
   isLoading?: boolean;
   label: string;
   type?: "button" | "submit" | "reset";
-  variant?: "primary" | "secondary";
+  variant?: "primary" | "secondary" | "danger";
 };
 
 const VariantBtn = ({
@@ -28,7 +28,10 @@ const VariantBtn = ({
       onClick={onClick}
       className={cn(
         "flex justify-center items-center bg-teal-600 hover:bg-teal-700 p-2 rounded min-w-32 min-h-10 text-white transition duration-300",
-        { "bg-gray-400 hover:bg-gray-500": variant == "secondary" },
+        {
+          "bg-gray-400 hover:bg-gray-500": variant == "secondary",
+          "bg-red-500 hover:bg-red-600": variant == "danger",
+        },
         classname
       )}
     >

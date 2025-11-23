@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import AdvSelect from "@/components/common/adv-select";
 import { DndContext } from "@dnd-kit/core";
 import StageComponent from "./stage-comp";
+import VariantBtn from "@/components/common/varitant-btn";
 
 type Props = {};
 
@@ -72,7 +73,7 @@ const BoardStatusOptions = [
   { label: "Upcoming", value: "upcoming" },
   { label: "Active", value: "in_progress" },
   { label: "Completed", value: "completed" },
-];
+] as const;
 
 const page = (props: Props) => {
   const { slug } = useParams();
@@ -147,12 +148,17 @@ const page = (props: Props) => {
     setBoardStages(BoardStageOptions[value]);
   }
 
+  function handleSubmit() {
+    try {
+    } catch (error) {}
+  }
+
   useEffect(() => {}, [editingId]);
 
   return (
     <div className="flex flex-col gap-4 w-full h-full">
       <h1 className="mb-2 text-3xl">{editingId ? "Edit" : "Add"} Board</h1>
-      <div className="flex flex-row gap-6">
+      <div className="flex flex-row flex-wrap gap-6 w-full">
         <AdvInput
           label="Name"
           placeholder="Board Name"
@@ -162,13 +168,13 @@ const page = (props: Props) => {
           id="board-name"
         />
         <AdvSelect
-          options={BoardStatusOptions}
+          options={BoardStatusOptions.filter(
+            (item) => !(item.value == "completed" && !editingId)
+          )}
           value={BoardStatus.value}
           onChange={onStatusChange}
           label="Board Status"
         />
-      </div>
-      <div className="flex flex-row gap-6 w-full">
         <AdvDatePicker
           label="Start Date"
           placeholder="Select Start Date"
@@ -188,6 +194,8 @@ const page = (props: Props) => {
           minDate={new Date()}
         />
       </div>
+      {/* <div className="flex flex-row gap-6 w-full">
+      </div> */}
       <div className="flex flex-row gap-6 w-full">
         <AdvSelect
           options={BoardStageSelections}
@@ -197,12 +205,17 @@ const page = (props: Props) => {
         />
       </div>
       <div className="flex">
-        <DndContext>
-          <StageComponent
-            BoardStages={BoardStages}
-            setBoardStages={setBoardStages}
-          />
-        </DndContext>
+        <StageComponent
+          BoardStages={BoardStages}
+          setBoardStages={setBoardStages}
+        />
+      </div>
+
+      <div className="flex flex-row justify-end mt-2 pr-10">
+        <VariantBtn
+          label={editingId ? "Save Board" : "Create Board"}
+          onClick={handleSubmit}
+        />
       </div>
     </div>
   );

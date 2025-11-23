@@ -1,20 +1,20 @@
-import { cn } from "@/lib/utils";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+"use client";
 import React, { useState } from "react";
 import AdvInput from "@/components/common/adv-input";
 import { EllipsisVertical } from "lucide-react";
-import VariantBtn from "@/components/common/varitant-btn";
-import { Switch } from "@/components/ui/switch";
 import Util from "@/utils/util";
+import StageEditModal from "./stage-edit-modal";
+import StageDivider from "./stage-divider";
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import StageCard from "./stage-card";
 
 type Props = {
   BoardStages: { label: string; is_final: boolean }[];
@@ -23,7 +23,7 @@ type Props = {
   >;
 };
 
-const defaultModalState = {
+export const defaultModalState = {
   isOpen: false,
   stageIndex: -1,
   label: "",
@@ -33,114 +33,111 @@ const defaultModalState = {
 
 const StageComponent = ({ BoardStages, setBoardStages }: Props) => {
   const [ModalState, setModalState] = useState(defaultModalState);
+  const [activeIdx, setActiveIdx] = useState(-1);
 
-  function onNameChange(value: string): boolean {
-    const copyState = { ...ModalState };
-    copyState.name_error = "";
-    copyState.label = value;
-    if (!Util.isNotNull(value))
-      copyState.name_error = "Stage name cannot be empty";
-    setModalState(copyState);
-    return copyState.name_error == "";
-  }
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      distance: 10,
+    },
+  });
 
-  function handleStageChange() {
-    const validation = onNameChange(ModalState.label);
-    if (!validation) return;
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: {
+      delay: 300,
+      tolerance: 5,
+    },
+  });
 
+  const sensors = useSensors(mouseSensor, touchSensor);
+
+  const addNewStage = (idx: number) => {
     const stages = [...BoardStages];
-    if (ModalState.stageIndex >= 0 && ModalState.stageIndex < stages.length) {
-      stages[ModalState.stageIndex] = {
-        label: ModalState.label,
-        is_final: ModalState.is_final,
-      };
+    stages.splice(idx, 0, {
+      label: "New Stage",
+      is_final: stages[idx - 1]?.is_final || false,
+    });
+    setBoardStages(stages);
+  };
+
+  function handleDragEnd(e: DragEndEvent) {
+    const fromIndex = e.active.data.current.index;
+    const toIndex = e.over?.data.current.index;
+
+    if (
+      !Util.isNotNull(toIndex) ||
+      !Util.isNotNull(fromIndex) ||
+      fromIndex == toIndex
+    ) {
+      setActiveIdx(-1);
+      return;
     }
 
-    // Reorder
+    const finalOutput: typeof BoardStages = [];
 
-    setBoardStages(stages);
-    setModalState(defaultModalState);
+    for (let i = 0; i <= BoardStages.length; i++) {
+      if (i == fromIndex) continue;
+      else {
+        if (i == toIndex) {
+          const isFinal =
+            i > 0 ? BoardStages[i - 1].is_final : BoardStages[i].is_final;
+          finalOutput.push({ ...BoardStages[fromIndex], is_final: isFinal });
+        }
+        if (i < BoardStages.length) finalOutput.push({ ...BoardStages[i] });
+      }
+    }
+
+    setBoardStages(finalOutput);
+    setActiveIdx(-1);
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <p className="text-gray-500 text-sm">
+    <div className="flex flex-col gap-2 w-full">
+      <p className="w-full text-gray-500 text-sm">
         Final stages always moved to the end
       </p>
 
-      <div className="flex flex-row gap-2">
-        {BoardStages.map((stage, index) => (
-          <div
-            className={cn(
-              "relative flex shadow px-5 py-3 border-2 border-gray-300 rounded text-sm cursor-grab",
-              { "border-green-400": stage.is_final }
-            )}
-            key={index}
-          >
-            <p>{stage.label}</p>
-            <EllipsisVertical
-              className="top-1 right-1 absolute cursor-pointer"
-              size={13}
-              onClick={() =>
-                setModalState({
-                  isOpen: true,
-                  stageIndex: index,
-                  label: stage.label,
-                  is_final: stage.is_final,
-                  name_error: "",
-                })
-              }
-            />
-          </div>
-        ))}
+      <div className="flex flex-row gap-2 pb-4 w-full overflow-x-auto whitespace-nowrap transition delay-500">
+        <DndContext
+          sensors={sensors}
+          onDragEnd={handleDragEnd}
+          onDragStart={(event) =>
+            setActiveIdx(event.active.data.current.index ?? -1)
+          }
+          onDragCancel={() => setActiveIdx(-1)}
+        >
+          <StageDivider index={0} onClick={() => addNewStage(0)} />
+          {BoardStages.map((stage, index) => (
+            <div key={index} className="flex flex-row gap-2">
+              <StageCard
+                stage={stage}
+                index={index}
+                setModalState={setModalState}
+              />
+              <StageDivider
+                index={index + 1}
+                onClick={() => addNewStage(index + 1)}
+              />
+            </div>
+          ))}
+          <DragOverlay dropAnimation={null}>
+            {activeIdx >= 0 && activeIdx < BoardStages.length ? (
+              <StageCard
+                stage={BoardStages[activeIdx]}
+                index={activeIdx}
+                setModalState={setModalState}
+                className="cursor-grabbing"
+              />
+            ) : null}
+          </DragOverlay>
+        </DndContext>
       </div>
 
-      <Dialog
-        open={ModalState.isOpen}
-        onOpenChange={(open) => setModalState({ ...ModalState, isOpen: open })}
-      >
-        <form onSubmit={handleStageChange}>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Edit Stage</DialogTitle>
-            </DialogHeader>
-            <div className="flex flex-col gap-4">
-              <AdvInput
-                id="name-1"
-                name="name"
-                label="Stage Name"
-                value={ModalState.label}
-                onChange={(e) => onNameChange(e.target.value)}
-                props={{
-                  autoFoxus: false,
-                }}
-                error={ModalState.name_error}
-              />
-              <div className="flex flex-row justify-between items-center">
-                <p>Final Stage</p>
-                <Switch
-                  id="airplane-mode"
-                  className={cn({ "!bg-green-500": ModalState.is_final })}
-                  checked={ModalState.is_final}
-                  onCheckedChange={(checked) =>
-                    setModalState({ ...ModalState, is_final: checked })
-                  }
-                />
-              </div>
-            </div>
-            <DialogFooter className="flex flex-row gap-4 mt-4">
-              <DialogClose asChild>
-                <VariantBtn label="Cancel" variant="secondary" />
-              </DialogClose>
-              <VariantBtn
-                label="Save"
-                type="submit"
-                onClick={handleStageChange}
-              />
-            </DialogFooter>
-          </DialogContent>
-        </form>
-      </Dialog>
+      <StageEditModal
+        ModalState={ModalState}
+        setModalState={setModalState}
+        setBoardStages={setBoardStages}
+        BoardStages={BoardStages}
+      />
     </div>
   );
 };
