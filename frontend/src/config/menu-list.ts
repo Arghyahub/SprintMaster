@@ -199,7 +199,7 @@ class MenuUtil {
     },
     {
       id: 6,
-      title: "Board",
+      title: "Boards",
       icon: LayoutDashboard,
       type: "link",
       path: "/home/board",

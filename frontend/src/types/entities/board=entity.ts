@@ -36,6 +36,7 @@ class BoardEntity {
   boardStages?: BoardStageEntity[];
   total_tasks?: number;
   pending_tasks?: number;
+  completed_tasks?: number;
 }
 
 export default BoardEntity;

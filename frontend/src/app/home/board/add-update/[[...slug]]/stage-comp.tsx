@@ -1,7 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import AdvInput from "@/components/common/adv-input";
-import { EllipsisVertical } from "lucide-react";
+import { EllipsisVertical, Info } from "lucide-react";
 import Util from "@/utils/util";
 import StageEditModal from "./stage-edit-modal";
 import StageDivider from "./stage-divider";
@@ -15,6 +15,7 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import StageCard from "./stage-card";
+import { Tooltip } from "react-tooltip";
 
 type Props = {
   BoardStages: { label: string; is_final: boolean }[];
@@ -34,6 +35,20 @@ export const defaultModalState = {
 const StageComponent = ({ BoardStages, setBoardStages }: Props) => {
   const [ModalState, setModalState] = useState(defaultModalState);
   const [activeIdx, setActiveIdx] = useState(-1);
+
+  const boardError = useMemo(() => {
+    let final = 0,
+      nonFinal = 0;
+    BoardStages.forEach((stage) => {
+      if (stage.is_final) final++;
+      else nonFinal++;
+    });
+
+    if (final == 0) return "At least one final stage is required.";
+    if (nonFinal == 0) return "At least one non-final stage is required.";
+
+    return "";
+  }, [BoardStages]);
 
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
@@ -92,9 +107,30 @@ const StageComponent = ({ BoardStages, setBoardStages }: Props) => {
 
   return (
     <div className="flex flex-col gap-2 w-full">
-      <p className="w-full text-gray-500 text-sm">
-        Final stages always moved to the end
-      </p>
+      <div className="flex flex-row justify-start gap-4">
+        <p className="text-gray-500 text-sm">
+          Final stages always moved to the end
+        </p>
+        {Util.isNotNull(boardError) && (
+          <>
+            <Info
+              data-tooltip-id={"stage-info"}
+              data-tooltip-content={boardError}
+              className="stroke-3 rounded-full size-4 font-semibold text-red-400 cursor-pointer"
+            />
+            <Tooltip
+              id={"stage-info"}
+              style={{
+                color: "white",
+                background: "red",
+                fontSize: "0.9rem",
+                padding: "0.2rem 0.4rem",
+                maxWidth: "200px",
+              }}
+            />
+          </>
+        )}
+      </div>
 
       <div className="flex flex-row gap-2 pb-4 w-full overflow-x-auto whitespace-nowrap transition delay-500">
         <DndContext

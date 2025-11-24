@@ -68,10 +68,16 @@ const page = (props: Props) => {
               <p>{board.name}</p>
               <div className="border w-full"></div>
               <div className="flex flex-row justify-between">
-                <p>Pending Tasks: </p>
                 <table>
                   <tr>
+                    <td className="pr-2">Pending Tasks:</td>
                     <td>{board?.pending_tasks ?? ""}</td>
+                    <td>/</td>
+                    <td>{board?.total_tasks ?? ""}</td>
+                  </tr>
+                  <tr>
+                    <td className="pr-2">Completed Tasks:</td>
+                    <td>{board?.completed_tasks ?? ""}</td>
                     <td>/</td>
                     <td>{board?.total_tasks ?? ""}</td>
                   </tr>

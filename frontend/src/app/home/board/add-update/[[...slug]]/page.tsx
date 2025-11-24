@@ -2,13 +2,15 @@
 import AdvDatePicker from "@/components/common/adv-date-picker";
 import AdvInput from "@/components/common/adv-input";
 import Util from "@/utils/util";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
 import AdvSelect from "@/components/common/adv-select";
 import { DndContext } from "@dnd-kit/core";
 import StageComponent from "./stage-comp";
 import VariantBtn from "@/components/common/varitant-btn";
+import { toast } from "sonner";
+import Api from "@/utils/api";
 
 type Props = {};
 
@@ -88,6 +90,8 @@ const page = (props: Props) => {
     error: "",
   });
 
+  const router = useRouter();
+
   const editingId = useMemo(
     () => (Number.isInteger(Number(slug?.[0])) ? Number(slug[0]) : undefined),
     [slug]
@@ -148,9 +152,46 @@ const page = (props: Props) => {
     setBoardStages(BoardStageOptions[value]);
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
+    console.log("here");
+    const validations = [
+      onChangeBoardName(BoardName.value),
+      onStartDateChange(Startdate.value),
+      onEndDateChange(Enddate.value),
+      onStatusChange(BoardStatus.value),
+      !BoardStages.every((stage) => stage.is_final == true),
+      !BoardStages.every((stage) => stage.is_final == false),
+    ].every((v) => v === true);
+
+    if (!validations) {
+      return;
+    }
+
     try {
-    } catch (error) {}
+      const data = {
+        id: editingId,
+        name: BoardName.value,
+        start_date: Startdate.value,
+        end_date: Enddate.value,
+        status: BoardStatus.value,
+        stages: BoardStages,
+      };
+
+      const res = await Api.post("/board/create-update", data);
+
+      if (res.status >= 200 && res.status < 400) {
+        toast.success(
+          `Board ${editingId ? "updated" : "created"} successfully.`
+        );
+        router.push("/home/board");
+      } else {
+        toast.error(
+          res.data?.message || "Failed to save board. Please try again."
+        );
+      }
+    } catch (error) {
+      toast.error("Failed to save board. Please try again.");
+    }
   }
 
   useEffect(() => {}, [editingId]);
