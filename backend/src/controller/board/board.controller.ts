@@ -3,17 +3,20 @@ import prisma from "../../db/prisma";
 import Api from "../../util/api";
 import Util from "../../util/utils";
 
-const getBoard = async (req: Request, res: Response) => {
+const getBoardSummary = async (req: Request, res: Response) => {
   try {
     const boards = await prisma.$queryRaw`
     SELECT 
       b.name,
+      b.id,
       COUNT(t.id) FILTER (WHERE bs.is_final = false)::numeric AS pending_tasks,
       COUNT(t.id)::numeric AS total_tasks,
       COUNT(t.id) FILTER (WHERE bs.is_final = true)::numeric AS completed_tasks
     FROM "Board" b
     LEFT JOIN "BoardStage" bs ON b.id = bs.board_id
     LEFT JOIN "Task" t ON bs.id = t.stage_id
+    INNER JOIN "RelationUserBoard" rub ON b.id = rub.board_id
+    WHERE rub.user_id = ${req.user.id}
     GROUP BY b.id, b.name
     `;
 
@@ -99,6 +102,9 @@ const createUpdateBoard = async (req: Request, res: Response) => {
               })),
             },
           },
+          relationUserBoards: {
+            create: { user_id: req.user.id },
+          },
         },
       });
 
@@ -119,9 +125,66 @@ const createUpdateBoard = async (req: Request, res: Response) => {
   }
 };
 
+const getBoard = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    if (!Util.isNotNull(id)) {
+      return Api.response({
+        res,
+        status: 400,
+        message: "Board ID not required.",
+      });
+    }
+
+    const board = await prisma.board.findUnique({
+      where: {
+        id: Number(id),
+        relationUserBoards: {
+          some: { user_id: req.user.id },
+        },
+      },
+      include: {
+        boardStages: {
+          include: {
+            tasks: true,
+          },
+          orderBy: {
+            order: "asc",
+          },
+        },
+      },
+    });
+
+    if (!board) {
+      return Api.response({
+        res,
+        status: 404,
+        message: "Board not found.",
+      });
+    }
+
+    return Api.response({
+      res,
+      status: 200,
+      message: "Board fetched successfully.",
+      payload: board,
+    });
+  } catch (error) {
+    console.error("Error fetching board:", error);
+    return Api.response({
+      res,
+      status: 500,
+      message: "Internal server error.",
+      error: error,
+    });
+  }
+};
+
 const boardController = {
-  getBoard,
+  getBoardSummary,
   createUpdateBoard,
+  getBoard,
 };
 
 export default boardController;

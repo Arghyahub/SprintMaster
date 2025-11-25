@@ -12,6 +12,12 @@ export class BoardStageEntity {
   name: string;
   board?: BoardEntity;
   tasks: TaskEntity[];
+
+  constructor() {
+    this.is_final = false;
+    this.name = "";
+    this.tasks = [];
+  }
 }
 
 class BoardEntity {
@@ -37,6 +43,19 @@ class BoardEntity {
   total_tasks?: number;
   pending_tasks?: number;
   completed_tasks?: number;
+
+  constructor() {
+    this.id = null;
+    this.name = "";
+    this.status = "awaiting";
+    this.company_id = null;
+    this.tasks = [];
+    this.relationUserBoards = [];
+    this.boardStages = [];
+    this.total_tasks = 0;
+    this.pending_tasks = 0;
+    this.completed_tasks = 0;
+  }
 }
 
 export default BoardEntity;

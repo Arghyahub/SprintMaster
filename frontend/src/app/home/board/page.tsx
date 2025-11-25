@@ -5,6 +5,7 @@ import useUserStore from "@/store/user-store";
 import BoardEntity from "@/types/entities/board=entity";
 import Api from "@/utils/api";
 import Util from "@/utils/util";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -61,7 +62,8 @@ const page = (props: Props) => {
       ) : (
         <div className="flex flex-row flex-wrap gap-4 w-full h-full">
           {Data.map((board) => (
-            <div
+            <Link
+              href={`/home/board/view/${board.id}`}
               key={board.id}
               className="flex flex-col gap-2 p-4 border rounded-lg"
             >
@@ -83,7 +85,7 @@ const page = (props: Props) => {
                   </tr>
                 </table>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}

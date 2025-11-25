@@ -203,7 +203,7 @@ class MenuUtil {
       icon: LayoutDashboard,
       type: "link",
       path: "/home/board",
-      access: ["access", "add"],
+      access: ["access", "add", "view"],
     },
   ] as const;
 }

@@ -4,7 +4,7 @@ import UserEntity from "./user-entity";
 class TaskEntity {
   id: number;
   name: string;
-  des3cr3iption3: string;
+  description: string;
   stage_id: number;
   board_stage: BoardStageEntity;
   start_date?: Date;

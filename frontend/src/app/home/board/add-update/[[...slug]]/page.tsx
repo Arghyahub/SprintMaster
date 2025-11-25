@@ -11,9 +11,11 @@ import StageComponent from "./stage-comp";
 import VariantBtn from "@/components/common/varitant-btn";
 import { toast } from "sonner";
 import Api from "@/utils/api";
+import useUserStore from "@/store/user-store";
 
 type Props = {};
 
+// page 6
 const BoardStageOptions = {
   development: [
     { label: "To Do", is_final: false },
@@ -79,6 +81,7 @@ const BoardStatusOptions = [
 
 const page = (props: Props) => {
   const { slug } = useParams();
+  const permissions = useUserStore((state) => state.getRolePermissions(6));
   const [BoardName, setBoardName] = useState({ value: "", error: "" });
   const [Startdate, setStartdate] = useState({ value: null, error: "" });
   const [Enddate, setEnddate] = useState({ value: null, error: "" });
@@ -89,6 +92,7 @@ const page = (props: Props) => {
     value: "upcoming",
     error: "",
   });
+  const [IsLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
 
@@ -168,6 +172,7 @@ const page = (props: Props) => {
     }
 
     try {
+      setIsLoading(true);
       const data = {
         id: editingId,
         name: BoardName.value,
@@ -191,10 +196,20 @@ const page = (props: Props) => {
       }
     } catch (error) {
       toast.error("Failed to save board. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   }
 
-  useEffect(() => {}, [editingId]);
+  useEffect(() => {
+    if (!permissions.access) {
+      Util.logout();
+      return;
+    }
+    if (!Util.isNotNull(editingId) && !permissions?.add) {
+      router.push("/home/board");
+    }
+  }, [editingId]);
 
   return (
     <div className="flex flex-col gap-4 w-full h-full">
@@ -256,6 +271,7 @@ const page = (props: Props) => {
         <VariantBtn
           label={editingId ? "Save Board" : "Create Board"}
           onClick={handleSubmit}
+          isLoading={IsLoading}
         />
       </div>
     </div>
