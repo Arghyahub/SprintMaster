@@ -18,6 +18,8 @@ import { toast } from "sonner";
 import TaskCard from "./task-card";
 import StageColumn from "./stage-column";
 import Util from "@/utils/util";
+import VariantBtn from "@/components/common/varitant-btn";
+import TaskModal from "./task-modal";
 
 type Props = {};
 
@@ -28,6 +30,7 @@ const page = (props: Props) => {
   const { slug } = useParams();
   const boardId = useMemo(() => slug?.[0], [slug]);
   const [Board, setBoard] = useState(defaultBoard);
+  const [isModalOpen, setisModalOpen] = useState(true);
   const router = useRouter();
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
@@ -55,6 +58,7 @@ const page = (props: Props) => {
         router.push("/home/board");
         return;
       } else {
+        router.push("/home/board");
         toast.error(res.data?.message ?? "Error fetching board");
       }
     } catch (error) {
@@ -101,7 +105,10 @@ const page = (props: Props) => {
   if (IsLoading) return <Loader />;
   return (
     <div className="flex flex-col gap-6 h-full">
-      <h1 className="text-3xl">{`Board ${Board.name}`}</h1>
+      <div className="flex flex-row justify-between">
+        <h1 className="text-3xl">{`Board ${Board.name}`}</h1>
+        <VariantBtn label="Create Task" onClick={() => setisModalOpen(true)} />
+      </div>
 
       <div className="flex flex-row gap-4 w-full h-full overflow-x-auto hide-scrollbar">
         <DndContext
@@ -122,6 +129,12 @@ const page = (props: Props) => {
           ))}
         </DndContext>
       </div>
+      <TaskModal
+        isOpen={isModalOpen}
+        setisOpen={setisModalOpen}
+        boardId={Number(boardId)}
+        setBoard={setBoard}
+      />
     </div>
   );
 };

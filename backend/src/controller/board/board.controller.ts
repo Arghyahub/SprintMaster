@@ -181,10 +181,93 @@ const getBoard = async (req: Request, res: Response) => {
   }
 };
 
+const createUpdateTask = async (req: Request, res: Response) => {
+  try {
+    const { name, description, boardId, id } = req.body || {};
+
+    const nullValues = Util.nullValues({ name, boardId });
+    if (nullValues.length > 0) {
+      return Api.response({
+        res,
+        status: 400,
+        message: `Missing fields ${Util.formatKeys(nullValues)}`,
+      });
+    }
+
+    if (Util.isNotNull(id)) {
+    } else {
+      const stage = await prisma.boardStage.findFirst({
+        where: {
+          is_final: false,
+          board_id: Number(boardId),
+        },
+        orderBy: {
+          order: "asc",
+        },
+      });
+
+      if (!stage)
+        return Api.response({
+          res,
+          status: 500,
+          message: "No final stage found, a board should have one final stage",
+        });
+
+      const task = await prisma.task.create({
+        data: {
+          name: name,
+          description: description ?? "",
+          created_by_id: req.user.id,
+          board_id: Number(boardId),
+          stage_id: stage.id,
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      const board = await prisma.board.findUnique({
+        where: {
+          id: Number(boardId),
+          relationUserBoards: {
+            some: { user_id: req.user.id },
+          },
+        },
+        include: {
+          boardStages: {
+            include: {
+              tasks: true,
+            },
+            orderBy: {
+              order: "asc",
+            },
+          },
+        },
+      });
+
+      return Api.response({
+        res,
+        status: 200,
+        message: "Task created successfully",
+        payload: board,
+      });
+    }
+  } catch (error) {
+    console.log("error ", error);
+    return Api.response({
+      res,
+      message: "Internal server error",
+      error: error?.message ?? "",
+      status: 500,
+    });
+  }
+};
+
 const boardController = {
   getBoardSummary,
   createUpdateBoard,
   getBoard,
+  createUpdateTask,
 };
 
 export default boardController;

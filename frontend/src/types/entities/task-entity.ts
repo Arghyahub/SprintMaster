@@ -4,6 +4,7 @@ import UserEntity from "./user-entity";
 class TaskEntity {
   id: number;
   name: string;
+  name_error: string;
   description: string;
   stage_id: number;
   board_stage: BoardStageEntity;
@@ -19,6 +20,12 @@ class TaskEntity {
   created_by_user?: UserEntity;
   updated_by_id: number;
   updated_by_user: UserEntity;
+
+  constructor() {
+    this.name = "";
+    this.description = "";
+    this.name_error = "";
+  }
 }
 
 export default TaskEntity;

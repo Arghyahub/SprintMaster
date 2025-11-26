@@ -66,7 +66,7 @@ const AdvInput = ({
           </>
         )}
       </div>
-      <div className="flex flex-row w-full">
+      <div className="flex flex-row w-full h-full">
         {type == "text-area" ? (
           <textarea
             placeholder={placeholder}
