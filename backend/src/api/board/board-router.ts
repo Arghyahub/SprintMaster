@@ -7,5 +7,6 @@ boardRouter.get("/", boardController.getBoardSummary);
 boardRouter.post("/create-update", boardController.createUpdateBoard);
 boardRouter.get("/{:id}", boardController.getBoard);
 boardRouter.post("/task/create-update", boardController.createUpdateTask);
+boardRouter.post("/task/move", boardController.moveTask);
 
 export default boardRouter;

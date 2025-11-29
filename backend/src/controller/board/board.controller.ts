@@ -263,11 +263,36 @@ const createUpdateTask = async (req: Request, res: Response) => {
   }
 };
 
+const moveTask = async (req: Request, res: Response) => {
+  try {
+    const { taskId, index } = req.body || {};
+    const nullValues = Util.nullValues({ taskId, index });
+    if (nullValues.length > 0) {
+      return Api.response({
+        res,
+        success: false,
+        status: 400,
+        message: `Missing required fields ${Util.formatKeys(nullValues)}`,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return Api.response({
+      res,
+      status: 500,
+      success: false,
+      message: "Internal server error",
+      error: error,
+    });
+  }
+};
+
 const boardController = {
   getBoardSummary,
   createUpdateBoard,
   getBoard,
   createUpdateTask,
+  moveTask,
 };
 
 export default boardController;

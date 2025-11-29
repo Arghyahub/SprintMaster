@@ -6,9 +6,10 @@ import React from "react";
 
 type Props = {
   task: TaskEntity;
+  stageId: number;
 };
 
-const TaskCard = ({ task }: Props) => {
+const TaskCard = ({ task, stageId }: Props) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
       id: `task-card-${task.id}`,
@@ -16,6 +17,7 @@ const TaskCard = ({ task }: Props) => {
         type: "task-card",
         id: task.id,
         task: task,
+        stageId,
       },
     });
   return (

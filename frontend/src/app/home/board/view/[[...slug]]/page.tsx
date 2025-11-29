@@ -30,7 +30,7 @@ const page = (props: Props) => {
   const { slug } = useParams();
   const boardId = useMemo(() => slug?.[0], [slug]);
   const [Board, setBoard] = useState(defaultBoard);
-  const [isModalOpen, setisModalOpen] = useState(true);
+  const [isModalOpen, setisModalOpen] = useState(false);
   const router = useRouter();
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
@@ -72,10 +72,15 @@ const page = (props: Props) => {
   function handleDragEnd(e: DragEndEvent) {
     const fromTask = e.active;
     const toStage = e.over;
+
+    let finalIdx = 0;
+
     if (!Util.isNotNull(fromTask) || !Util.isNotNull(toStage)) return;
+
     if (
       fromTask.data?.current?.type !== "task-card" ||
-      toStage.data?.current?.type !== "stage-column"
+      (toStage.data?.current?.type !== "stage-column" &&
+        toStage.data?.current?.type !== "task-divider")
     )
       return;
 
@@ -85,9 +90,13 @@ const page = (props: Props) => {
         (task) => task.id !== fromTask?.data?.current?.id
       );
 
-      // Inserting at start, need to change that
       if (toStage?.data?.current?.id == stage.id) {
-        tasks.unshift(fromTask.data?.current?.task);
+        const index = toStage?.data?.current?.index;
+        finalIdx = index ?? tasks.length;
+
+        const newTask = fromTask.data?.current?.task;
+        if (Util.isNotNull(index)) tasks.splice(index, 0, { ...newTask });
+        else tasks.push({ ...newTask });
       }
 
       stage.tasks = [...tasks];
@@ -96,6 +105,12 @@ const page = (props: Props) => {
     });
 
     setBoard(BoardCopy);
+
+    try {
+    } catch (error) {
+      console.log("error ", error);
+      toast.error("Unable to update task to server, Kindly reload");
+    }
   }
 
   useEffect(() => {
@@ -123,7 +138,6 @@ const page = (props: Props) => {
             // setActiveIdx(-1)
           }
         >
-          {/* <StageDivider index={0} onClick={() => addNewStage(0)} /> */}
           {Board.boardStages?.map((stage) => (
             <StageColumn stage={stage} key={stage.id} />
           ))}

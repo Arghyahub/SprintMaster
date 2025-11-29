@@ -4,7 +4,6 @@ import AdvInput from "@/components/common/adv-input";
 import { EllipsisVertical, Info } from "lucide-react";
 import Util from "@/utils/util";
 import StageEditModal from "./stage-edit-modal";
-import StageDivider from "./stage-divider";
 import {
   DndContext,
   DragEndEvent,
@@ -16,6 +15,7 @@ import {
 } from "@dnd-kit/core";
 import StageCard from "./stage-card";
 import { Tooltip } from "react-tooltip";
+import StageDivider from "./stage-divider";
 
 type Props = {
   BoardStages: { label: string; is_final: boolean }[];
