@@ -63,7 +63,8 @@ const page = (props: Props) => {
     {
       id: 0,
       icon: <Edit className="size-5" />,
-      callback: (row) => router.push(`/home/company/people/${row?.id}`),
+      callback: (row) =>
+        router.push(`/home/company/people/add-edit/${row?.id}`),
       hideMenuCb: () => !permissions?.edit,
       label: "Edit",
     },
@@ -95,7 +96,10 @@ const page = (props: Props) => {
     <div className="flex flex-col gap-4 w-full h-full">
       <div className="flex flex-row justify-between">
         <h1 className="font-medium text-3xl">Manage People</h1>
-        <VariantBtn label="Add People" />
+        <VariantBtn
+          onClick={() => router.push("/home/company/people/add-edit")}
+          label="Add People"
+        />
       </div>
 
       <MRTable

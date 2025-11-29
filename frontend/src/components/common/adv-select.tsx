@@ -19,7 +19,7 @@ type ErrorIdReq =
 type Props = {
   label?: string;
   placeholder?: string;
-  value?: string;
+  value?: any;
   onChange?: (val: any) => any;
   className?: string;
   options: { label: string; value: any }[];

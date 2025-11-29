@@ -17,5 +17,11 @@ companyRouter.post(
 
 companyRouter.get("/dashboard", companyController.getDashboardData);
 companyRouter.get("/people", companyController.getPeopleList);
+companyRouter.get("/roles", companyController.getRoles);
+companyRouter.get("/people/{:id}", companyController.getCompanyUser);
+companyRouter.post(
+  "/people/update",
+  companyController.createOrUpdateCompanyUser
+);
 
 export default companyRouter;

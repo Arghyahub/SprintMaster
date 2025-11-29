@@ -196,11 +196,141 @@ const getPeopleList = async (req: Request, res: Response) => {
   }
 };
 
+const getRoles = async (req: Request, res: Response) => {
+  try {
+    const roles = await prisma.accessRole.findMany({
+      where: {
+        is_master: true,
+        for_type: {
+          notIn: ["admin", "super_admin"],
+        },
+      },
+      select: {
+        name: true,
+        id: true,
+      },
+    });
+
+    return Api.response({
+      res,
+      status: 200,
+      message: "Access Roles fetched successfully",
+      payload: roles,
+    });
+  } catch (error) {
+    console.log(error);
+    return Api.response({
+      res,
+      message: "Internal server error",
+      status: 500,
+      error: error?.message,
+    });
+  }
+};
+
+const getCompanyUser = async (req: Request, res: Response) => {
+  const { id } = req.params || {};
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: req.user.id,
+      },
+      select: {
+        company_id: true,
+      },
+    });
+
+    const companyUser = await prisma.user.findFirst({
+      where: {
+        id: Number(id),
+        company_id: user.company_id,
+      },
+    });
+
+    if (!companyUser)
+      return Api.response({
+        res,
+        status: 400,
+        message: "User not found",
+      });
+
+    return Api.response({
+      res,
+      status: 200,
+      message: "Data fetched succesfully",
+      payload: companyUser,
+    });
+  } catch (error) {
+    console.log(error);
+    return Api.response({
+      res,
+      message: "Internal server error",
+      status: 500,
+      error: error?.message,
+    });
+  }
+};
+
+const createOrUpdateCompanyUser = async (req: Request, res: Response) => {
+  try {
+    const { id, name, email, role_id } = req.body || {};
+    const nullValues = Util.nullValues({ name, email, role_id });
+
+    if (nullValues.length > 0) {
+      return Api.response({
+        res,
+        status: 400,
+        message: `Missing required fields ${Util.formatKeys(nullValues)}`,
+      });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: req.user.id,
+      },
+      select: {
+        company_id: true,
+      },
+    });
+
+    if (Util.isNotNull(id)) {
+      await prisma.user.update({
+        where: {
+          id: id,
+          company_id: user.company_id,
+        },
+        data: {
+          name: name,
+          email: email,
+          access_role_id: role_id,
+        },
+      });
+    } else {
+    }
+
+    return Api.response({
+      res,
+      status: 200,
+      message: "User updated successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    return Api.response({
+      res,
+      status: 500,
+      message: "Internal server error",
+    });
+  }
+};
+
 const companyController = {
   getCompanyDetails,
   createOrUpdateCompany,
   getDashboardData,
   getPeopleList,
+  getRoles,
+  getCompanyUser,
+  createOrUpdateCompanyUser,
 };
 
 export default companyController;

@@ -28,6 +28,7 @@ class UserEntity {
     this.user_type = "employee";
     this.access_role_id = null;
     this.access_role = null;
+    this.access_role_id_error = "";
   }
 }
 
