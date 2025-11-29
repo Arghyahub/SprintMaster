@@ -16,5 +16,6 @@ companyRouter.post(
 );
 
 companyRouter.get("/dashboard", companyController.getDashboardData);
+companyRouter.get("/people", companyController.getPeopleList);
 
 export default companyRouter;

@@ -7,6 +7,7 @@ import {
   ScanFace,
   Settings,
   User,
+  UserRoundPen,
   UserStar,
 } from "lucide-react";
 import config from "./config";
@@ -195,6 +196,13 @@ class MenuUtil {
           path: "/home/company/setup",
           access: ["access", "add", "edit"],
         },
+        {
+          id: 7,
+          title: "People",
+          icon: UserRoundPen,
+          path: "/home/company/people",
+          access: ["access", "add", "edit"],
+        },
       ],
     },
     {
@@ -208,7 +216,7 @@ class MenuUtil {
   ] as const;
 }
 // Update this variable to the last ID used in your menu items
-const lastId = 6 as const;
+const lastId = 7 as const;
 
 MenuUtil.validateUniqueIds();
 

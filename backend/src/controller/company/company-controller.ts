@@ -153,10 +153,54 @@ const getDashboardData = async (req: Request, res: Response) => {
   }
 };
 
+const getPeopleList = async (req: Request, res: Response) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: req.user.id,
+      },
+      select: {
+        id: true,
+        company_id: true,
+      },
+    });
+
+    const companyPeople = await prisma.user.findMany({
+      where: {
+        company_id: user.company_id,
+        // id: {
+        //   not: user.id
+        // }
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        user_type: true,
+      },
+    });
+
+    return Api.response({
+      res,
+      status: 200,
+      message: "User data fetched successfully",
+      payload: companyPeople,
+    });
+  } catch (error) {
+    console.log(error);
+    return Api.response({
+      res,
+      status: 500,
+      message: "Internal server error",
+    });
+  }
+};
+
 const companyController = {
   getCompanyDetails,
   createOrUpdateCompany,
   getDashboardData,
+  getPeopleList,
 };
 
 export default companyController;
