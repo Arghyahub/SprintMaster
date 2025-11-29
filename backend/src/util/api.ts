@@ -13,13 +13,13 @@ class Api {
   static response({
     res,
     status = 200,
-    success = false,
+    success,
     message,
     error,
     payload,
   }: ApiResponse): void {
     res.status(status).json({
-      success,
+      success: success ? success : status >= 200 && status < 400,
       message,
       error,
       payload,

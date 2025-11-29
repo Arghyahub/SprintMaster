@@ -147,7 +147,11 @@ const getBoard = async (req: Request, res: Response) => {
       include: {
         boardStages: {
           include: {
-            tasks: true,
+            tasks: {
+              orderBy: {
+                order: "asc",
+              },
+            },
           },
           orderBy: {
             order: "asc",
@@ -213,6 +217,12 @@ const createUpdateTask = async (req: Request, res: Response) => {
           message: "No final stage found, a board should have one final stage",
         });
 
+      const totalTasks = await prisma.task.count({
+        where: {
+          stage_id: stage.id,
+        },
+      });
+
       const task = await prisma.task.create({
         data: {
           name: name,
@@ -220,6 +230,7 @@ const createUpdateTask = async (req: Request, res: Response) => {
           created_by_id: req.user.id,
           board_id: Number(boardId),
           stage_id: stage.id,
+          order: totalTasks,
         },
         select: {
           id: true,
@@ -265,7 +276,7 @@ const createUpdateTask = async (req: Request, res: Response) => {
 
 const moveTask = async (req: Request, res: Response) => {
   try {
-    const { taskId, index } = req.body || {};
+    const { taskId, stageId, index } = req.body || {};
     const nullValues = Util.nullValues({ taskId, index });
     if (nullValues.length > 0) {
       return Api.response({
@@ -275,6 +286,31 @@ const moveTask = async (req: Request, res: Response) => {
         message: `Missing required fields ${Util.formatKeys(nullValues)}`,
       });
     }
+
+    await prisma.task.updateMany({
+      where: { stage_id: stageId, order: { gte: index } },
+      data: {
+        order: {
+          increment: 1,
+        },
+      },
+    });
+
+    await prisma.task.update({
+      where: {
+        id: taskId,
+      },
+      data: {
+        stage_id: stageId,
+        order: index,
+      },
+    });
+
+    return Api.response({
+      res,
+      status: 200,
+      message: "Board order updated successfully",
+    });
   } catch (error) {
     console.log(error);
     return Api.response({

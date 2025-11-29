@@ -69,7 +69,7 @@ const page = (props: Props) => {
     }
   }
 
-  function handleDragEnd(e: DragEndEvent) {
+  async function handleDragEnd(e: DragEndEvent) {
     const fromTask = e.active;
     const toStage = e.over;
 
@@ -107,6 +107,18 @@ const page = (props: Props) => {
     setBoard(BoardCopy);
 
     try {
+      const payload = {
+        taskId: fromTask?.data?.current?.id,
+        stageId: toStage?.data?.current?.id,
+        index: finalIdx,
+      };
+
+      const res = await Api.post("/board/task/move", payload);
+      if (res.data.success) {
+        console.log("Task moved successfully");
+      } else {
+        toast.error(res.data.message ?? "Server error");
+      }
     } catch (error) {
       console.log("error ", error);
       toast.error("Unable to update task to server, Kindly reload");

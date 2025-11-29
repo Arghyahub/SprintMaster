@@ -119,6 +119,7 @@ model Task {
   description      String
   stage_id         Int
   board_stage      BoardStage @relation(fields: [stage_id], references: [id])
+  order            Int
   start_date       DateTime?
   end_date         DateTime?
   board_id         Int

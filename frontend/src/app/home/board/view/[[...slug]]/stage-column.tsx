@@ -27,7 +27,7 @@ const StageColumn = ({ stage }: Props) => {
         {stage.name}
       </div>
       <div className="flex flex-col pt-2 pb-4 w-full h-full overflow-y-auto hide-scrollbar">
-        <TaskDivider index={-1} stageId={stage.id} />
+        <TaskDivider index={0} stageId={stage.id} />
         {stage.tasks.map((task, idx) => (
           <div key={task.id} className="flex flex-col w-full">
             <TaskCard task={task} stageId={stage.id} />
