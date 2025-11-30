@@ -7,6 +7,7 @@ import UserEntity from "@/types/entities/user-entity";
 import Api from "@/utils/api";
 import Util from "@/utils/util";
 import Validator from "@/utils/validator";
+import { Eye, EyeOff } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -20,6 +21,8 @@ const page = (props: Props) => {
   const [UserState, setUserState] = useState(defaultUser);
   const [AccessRoles, setAccessRoles] = useState([]);
   const [IsLoading, setIsLoading] = useState(false);
+  const [IsSubmititng, setIsSubmititng] = useState(false);
+  const [ShowPassword, setShowPassword] = useState(false);
 
   const editingId = useMemo(
     () => (Util.isNotNull(slug?.[0]) ? Number(slug[0]) : null),
@@ -49,6 +52,18 @@ const page = (props: Props) => {
     if (!Util.isNotNull(value)) copyState.name_error = "Name cannot be empty";
     setUserState(copyState);
     return copyState.name_error == "";
+  }
+  function handlePasswordChange(value: string) {
+    const copyState = { ...UserState };
+    copyState.password = value;
+    copyState.password_error = "";
+    if (!Util.isNotNull(value))
+      copyState.password_error = "password cannot be empty";
+    else if (!Validator.isValidPassword(value))
+      copyState.password_error =
+        "Password must be 8 character with 1 uppercase, 1 special character and a number";
+    setUserState(copyState);
+    return copyState.password_error == "" || editingId;
   }
 
   function handleEmailChange(val: string = "") {
@@ -94,15 +109,23 @@ const page = (props: Props) => {
       handleNameChange(UserState.name),
       handleEmailChange(UserState.email),
       handleRoleChange(UserState.access_role_id),
+      handlePasswordChange(UserState?.password),
     ].every(Boolean);
     if (!validation) return;
 
+    const role = AccessRoles.find(
+      (role) => role.value == UserState.access_role_id
+    );
+
     try {
+      setIsSubmititng(true);
       const payload = {
         id: editingId,
         name: UserState.name,
         email: UserState.email,
         role_id: UserState.access_role_id,
+        password: UserState.password,
+        user_type: role.value == "Manager" ? "manager" : "employee",
       };
 
       const res = await Api.post("/company/people/update", payload);
@@ -117,6 +140,8 @@ const page = (props: Props) => {
     } catch (error) {
       console.log(error);
       toast.error("Unable to update user data");
+    } finally {
+      setIsSubmititng(false);
     }
   };
 
@@ -134,14 +159,14 @@ const page = (props: Props) => {
   if (IsLoading) return <Loader />;
 
   return (
-    <div className="flex flex-col gap-4 w-full h-full">
+    <div className="flex flex-col gap-6 w-full h-full">
       <h1 className="font-medium text-3xl">
         {editingId ? "Edit User" : "Add User"}
       </h1>
 
-      <div className="flex flex-row gap-6">
+      <div className="flex flex-row flex-wrap gap-6">
         <AdvInput
-          label="Name"
+          label="Name *"
           value={UserState.name}
           error={UserState.name_error}
           id="user_name"
@@ -149,7 +174,7 @@ const page = (props: Props) => {
           onChange={(e) => handleNameChange(e.target.value)}
         />
         <AdvInput
-          label="Email"
+          label="Email *"
           type="text"
           value={UserState.email}
           error={UserState.email_error}
@@ -158,7 +183,7 @@ const page = (props: Props) => {
           onChange={(e) => handleEmailChange(e.target.value)}
         />
         <AdvSelect
-          label="Role"
+          label="Role *"
           placeholder="Select Role"
           options={AccessRoles}
           value={UserState.access_role_id}
@@ -166,15 +191,37 @@ const page = (props: Props) => {
           id="user_role"
           onChange={handleRoleChange}
         />
+        <AdvInput
+          type={ShowPassword ? "text" : "password"}
+          label="Password *"
+          value={UserState.password}
+          error={UserState.password_error}
+          id="user_password"
+          placeholder="Enter password"
+          onChange={(e) => handlePasswordChange(e.target.value)}
+          SuffixIcon={
+            ShowPassword ? (
+              <EyeOff
+                onClick={() => setShowPassword((prev) => !prev)}
+                strokeWidth={1.2}
+                className="cursor-pointer"
+              />
+            ) : (
+              <Eye
+                onClick={() => setShowPassword((prev) => !prev)}
+                strokeWidth={1.2}
+                className="cursor-pointer"
+              />
+            )
+          }
+        />
       </div>
       <div className="flex mt-2">
-        {!Util.isNotNull(editingId) && (
-          <p>New users have to reset their password to login</p>
-        )}
         <VariantBtn
           onClick={handleSubmit}
           label="Submit"
           classname="ml-auto mr-5 xl:mr-20"
+          isLoading={IsSubmititng}
         />
       </div>
     </div>

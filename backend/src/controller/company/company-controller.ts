@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Api from "../../util/api";
 import prisma from "../../db/prisma";
 import Util from "../../util/utils";
+import Cryptr from "../../util/cryptr";
 
 const getCompanyDetails = async (req: Request, res: Response) => {
   try {
@@ -273,7 +274,7 @@ const getCompanyUser = async (req: Request, res: Response) => {
 
 const createOrUpdateCompanyUser = async (req: Request, res: Response) => {
   try {
-    const { id, name, email, role_id } = req.body || {};
+    const { id, name, email, role_id, user_type } = req.body || {};
     const nullValues = Util.nullValues({ name, email, role_id });
 
     if (nullValues.length > 0) {
@@ -303,9 +304,46 @@ const createOrUpdateCompanyUser = async (req: Request, res: Response) => {
           name: name,
           email: email,
           access_role_id: role_id,
+          user_type: user_type,
         },
       });
     } else {
+      const { password } = req.body || {};
+      if (!Util.isNotNull(password))
+        return Api.response({
+          res,
+          message: "missing required field password",
+          status: 400,
+        });
+
+      const existingUser = await prisma.user.findFirst({
+        where: {
+          email: {
+            equals: email.trim(),
+            mode: "insensitive",
+          },
+        },
+      });
+
+      if (existingUser) {
+        return Api.response({
+          res,
+          status: 400,
+          message: "A user with this email already exists",
+        });
+      }
+
+      const hash = await Cryptr.hashPassword(password);
+      await prisma.user.create({
+        data: {
+          name: name,
+          email: email,
+          password: hash,
+          access_role_id: role_id,
+          user_type: user_type,
+          company_id: user.company_id,
+        },
+      });
     }
 
     return Api.response({

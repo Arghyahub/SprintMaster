@@ -21,13 +21,10 @@ class UserEntity {
   company?: CompanyEntity;
 
   constructor() {
-    this.id = null;
     this.name = "";
     this.email = "";
     this.password = "";
     this.user_type = "employee";
-    this.access_role_id = null;
-    this.access_role = null;
     this.access_role_id_error = "";
   }
 }
