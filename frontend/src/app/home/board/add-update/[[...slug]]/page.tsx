@@ -12,6 +12,16 @@ import VariantBtn from "@/components/common/varitant-btn";
 import { toast } from "sonner";
 import Api from "@/utils/api";
 import useUserStore from "@/store/user-store";
+import Loader from "@/components/common/loader";
+import {
+  Box,
+  Chip,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  OutlinedInput,
+  Select,
+} from "@mui/material";
 
 type Props = {};
 
@@ -79,12 +89,16 @@ const BoardStatusOptions = [
   { label: "Completed", value: "completed" },
 ] as const;
 
+type SelectionOption = { label: string; value: any };
+
 const page = (props: Props) => {
   const { slug } = useParams();
   const permissions = useUserStore((state) => state.getRolePermissions(6));
   const [BoardName, setBoardName] = useState({ value: "", error: "" });
   const [Startdate, setStartdate] = useState({ value: null, error: "" });
   const [Enddate, setEnddate] = useState({ value: null, error: "" });
+  const [CompanyUsers, setCompanyUsers] = useState<SelectionOption[]>([]);
+  const [SelectedUsers, setSelectedUsers] = useState<number[]>([]);
   const [BoardStageSelectikon, setBoardStageSelectikon] =
     useState<BoardStageKey>("development");
   const [BoardStages, setBoardStages] = useState(BoardStageOptions.development);
@@ -92,6 +106,7 @@ const page = (props: Props) => {
     value: "upcoming",
     error: "",
   });
+  const [IsSubmitting, setIsSubmitting] = useState(false);
   const [IsLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
@@ -99,6 +114,11 @@ const page = (props: Props) => {
   const editingId = useMemo(
     () => (Number.isInteger(Number(slug?.[0])) ? Number(slug[0]) : undefined),
     [slug]
+  );
+
+  const selectedUserArr = useMemo(
+    () => CompanyUsers.filter((usr) => SelectedUsers.includes(usr.value)),
+    [CompanyUsers, SelectedUsers]
   );
 
   function onChangeBoardName(value: string): boolean {
@@ -171,8 +191,13 @@ const page = (props: Props) => {
       return;
     }
 
+    if (SelectedUsers.length == 0) {
+      toast.error("Please select atleast one user");
+      return;
+    }
+
     try {
-      setIsLoading(true);
+      setIsSubmitting(true);
       const data = {
         id: editingId,
         name: BoardName.value,
@@ -180,6 +205,7 @@ const page = (props: Props) => {
         end_date: Enddate.value,
         status: BoardStatus.value,
         stages: BoardStages,
+        user_ids: SelectedUsers,
       };
 
       const res = await Api.post("/board/create-update", data);
@@ -197,6 +223,28 @@ const page = (props: Props) => {
     } catch (error) {
       toast.error("Failed to save board. Please try again.");
     } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function getCompanyUsers() {
+    try {
+      setIsLoading(true);
+      const res = await Api.get("/company/people");
+      if (res.data.success) {
+        setCompanyUsers(
+          res.data.payload.map((usr) => ({
+            label: usr.name,
+            value: usr.id,
+          }))
+        );
+      } else {
+        toast.error(res.data?.message ?? "Unable to fetch users");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Unable to fetch user data");
+    } finally {
       setIsLoading(false);
     }
   }
@@ -209,7 +257,10 @@ const page = (props: Props) => {
     if (!Util.isNotNull(editingId) && !permissions?.add) {
       router.push("/home/board");
     }
+    getCompanyUsers();
   }, [editingId]);
+
+  if (IsLoading) return <Loader />;
 
   return (
     <div className="flex flex-col gap-4 w-full h-full">
@@ -267,11 +318,49 @@ const page = (props: Props) => {
         />
       </div>
 
+      <div className="flex flex-col w-full">
+        <FormControl sx={{ mt: "10px", mb: "15px" }}>
+          <InputLabel id="demo-multiple-chip-label">Chip</InputLabel>
+          <Select
+            labelId="demo-multiple-chip-label"
+            id="demo-multiple-chip"
+            multiple
+            value={SelectedUsers}
+            onChange={(e) => {
+              const val = e.target.value as any[];
+              setSelectedUsers(val);
+            }}
+            input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+            renderValue={(selected) => {
+              // console.log("selected ", selected);
+              return (
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                  {selectedUserArr.map((usr) => (
+                    <Chip key={usr.value} label={usr.label} />
+                  ))}
+                </Box>
+              );
+            }}
+            // MenuProps={MenuProps}
+          >
+            {CompanyUsers.map((usr) => (
+              <MenuItem
+                key={usr.value}
+                value={usr.value}
+                // style={getStyles(name, personName, theme)}
+              >
+                {usr.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </div>
+
       <div className="flex flex-row justify-end mt-2 pr-10">
         <VariantBtn
           label={editingId ? "Save Board" : "Create Board"}
           onClick={handleSubmit}
-          isLoading={IsLoading}
+          isLoading={IsSubmitting}
         />
       </div>
     </div>
