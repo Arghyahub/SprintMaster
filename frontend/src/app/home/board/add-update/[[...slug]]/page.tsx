@@ -17,6 +17,7 @@ import {
   Box,
   Chip,
   FormControl,
+  FormHelperText,
   InputLabel,
   MenuItem,
   OutlinedInput,
@@ -94,11 +95,12 @@ type SelectionOption = { label: string; value: any };
 const page = (props: Props) => {
   const { slug } = useParams();
   const permissions = useUserStore((state) => state.getRolePermissions(6));
+  const user = useUserStore((state) => state.user);
   const [BoardName, setBoardName] = useState({ value: "", error: "" });
   const [Startdate, setStartdate] = useState({ value: null, error: "" });
   const [Enddate, setEnddate] = useState({ value: null, error: "" });
   const [CompanyUsers, setCompanyUsers] = useState<SelectionOption[]>([]);
-  const [SelectedUsers, setSelectedUsers] = useState<number[]>([]);
+  const [SelectedUsers, setSelectedUsers] = useState<number[]>([user.id]);
   const [BoardStageSelectikon, setBoardStageSelectikon] =
     useState<BoardStageKey>("development");
   const [BoardStages, setBoardStages] = useState(BoardStageOptions.development);
@@ -320,7 +322,7 @@ const page = (props: Props) => {
 
       <div className="flex flex-col w-full">
         <FormControl sx={{ mt: "10px", mb: "15px" }}>
-          <InputLabel id="demo-multiple-chip-label">Chip</InputLabel>
+          <InputLabel id="demo-multiple-chip-label">Select users</InputLabel>
           <Select
             labelId="demo-multiple-chip-label"
             id="demo-multiple-chip"

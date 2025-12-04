@@ -39,7 +39,7 @@ const getBoardSummary = async (req: Request, res: Response) => {
 
 const createUpdateBoard = async (req: Request, res: Response) => {
   try {
-    const { id, name, start_date, end_date, status } = req.body;
+    const { id, name, start_date, end_date, status, user_ids } = req.body;
     const { stages } = req.body as {
       stages: { label: string; is_final: boolean }[];
     };
@@ -55,6 +55,7 @@ const createUpdateBoard = async (req: Request, res: Response) => {
       status,
       stages,
       company: user.company_id,
+      user_ids,
     });
 
     if (nullValues.length > 0) {
@@ -65,7 +66,20 @@ const createUpdateBoard = async (req: Request, res: Response) => {
       });
     }
 
+    if (user_ids.length == 0)
+      return Api.response({
+        res,
+        status: 400,
+        message: "Atleast one user needs to be selected for a sprint.",
+      });
+
     if (Util.isNotNull(id)) {
+      await prisma.relationUserBoard.deleteMany({
+        where: {
+          board_id: Number(id),
+        },
+      });
+
       await prisma.board.update({
         where: { id: Number(id) },
         data: {
@@ -80,6 +94,13 @@ const createUpdateBoard = async (req: Request, res: Response) => {
                 name: stage.label,
                 is_final: stage.is_final,
                 order: index,
+              })),
+            },
+          },
+          relationUserBoards: {
+            createMany: {
+              data: user_ids.map((usr) => ({
+                user_id: usr,
               })),
             },
           },
@@ -103,7 +124,11 @@ const createUpdateBoard = async (req: Request, res: Response) => {
             },
           },
           relationUserBoards: {
-            create: { user_id: req.user.id },
+            createMany: {
+              data: user_ids.map((usr) => ({
+                user_id: usr,
+              })),
+            },
           },
         },
       });
@@ -155,6 +180,16 @@ const getBoard = async (req: Request, res: Response) => {
           },
           orderBy: {
             order: "asc",
+          },
+        },
+        relationUserBoards: {
+          select: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
           },
         },
       },
