@@ -160,6 +160,7 @@ const page = (props: Props) => {
         setisOpen={setisModalOpen}
         boardId={Number(boardId)}
         setBoard={setBoard}
+        users={Board?.relationUserBoards?.map((rel) => rel?.user) ?? []}
       />
     </div>
   );

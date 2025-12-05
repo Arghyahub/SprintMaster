@@ -3,6 +3,7 @@ import React from "react";
 import TaskCard from "./task-card";
 import { useDroppable } from "@dnd-kit/core";
 import TaskDivider from "./task-divider";
+import { cn } from "@/lib/utils";
 
 type Props = {
   stage: BoardStageEntity;
@@ -23,8 +24,13 @@ const StageColumn = ({ stage }: Props) => {
       ref={setNodeRef}
       className="flex flex-col p-2 border-2 border-gray-400 rounded w-80 min-w-80 h-full"
     >
-      <div className="top-0 sticky flex flex-row justify-center px-2 py-3 border-gray-300 border-b-2 w-full font-medium text-xl">
-        {stage.name}
+      <div
+        className={cn(
+          "top-0 sticky flex flex-row justify-center px-2 py-3 border-gray-300 border-b-2 w-full font-medium text-xl",
+          { "text-green-700": stage.is_final }
+        )}
+      >
+        {stage.name} {stage.tasks?.length > 0 && `(${stage?.tasks?.length})`}
       </div>
       <div className="flex flex-col pt-2 pb-4 w-full h-full overflow-y-auto hide-scrollbar">
         <TaskDivider index={0} stageId={stage.id} />

@@ -22,17 +22,22 @@ import BoardEntity from "@/types/entities/board=entity";
 import Api from "@/utils/api";
 import { Description } from "@radix-ui/react-dialog";
 import { toast } from "sonner";
+import AdvDatePicker from "@/components/common/adv-date-picker";
+import dayjs from "dayjs";
+import UserEntity from "@/types/entities/user-entity";
+import AdvSelect from "@/components/common/adv-select";
 
 type Props = {
   isOpen: boolean;
   setisOpen: React.Dispatch<React.SetStateAction<boolean>>;
   boardId: number;
   setBoard: React.Dispatch<React.SetStateAction<BoardEntity>>;
+  users: UserEntity[];
 };
 
 const defaultTask = new TaskEntity();
 
-const TaskModal = ({ isOpen, setisOpen, boardId, setBoard }: Props) => {
+const TaskModal = ({ isOpen, setisOpen, boardId, setBoard, users }: Props) => {
   const router = useRouter();
   const [showSkeleton, setshowSkeleton] = useState(false);
   const [TaskState, setTaskState] = useState(defaultTask);
@@ -43,15 +48,62 @@ const TaskModal = ({ isOpen, setisOpen, boardId, setBoard }: Props) => {
     const taskId = params.get("task");
     if (Util.isNotNull(taskId)) return Number(taskId);
   }, [params]);
+
   const isTaskEdited = useMemo(
     () => !equal(TaskState, EditedTask),
     [TaskState, EditedTask]
   );
 
+  const assignables = useMemo(() => {
+    return users.map((usr) => ({
+      label: usr.name,
+      value: usr.id,
+    }));
+  }, [users]);
+
   async function handleOpenModal(id: number) {
     setisOpen(true);
     try {
     } catch (error) {}
+  }
+
+  function onStartDateChange(value: Date): boolean {
+    const editDataCopy = { ...EditedTask };
+    editDataCopy.start_date = value;
+    editDataCopy.start_date_error = "";
+    if (!Util.isNotNull(value))
+      editDataCopy.start_date_error = "Start date cannot be empty.";
+    else if (
+      Util.isNotNull(editDataCopy.end_date) &&
+      dayjs(value).isAfter(dayjs(editDataCopy.end_date))
+    ) {
+      editDataCopy.end_date = null;
+      editDataCopy.end_date_error = "";
+    }
+    setEditedTask(editDataCopy);
+    return editDataCopy.start_date_error === "";
+  }
+
+  function onEndDateChange(value: Date): boolean {
+    const endDateCopy = { ...EditedTask };
+    endDateCopy.end_date = value;
+    endDateCopy.end_date_error = "";
+    if (!Util.isNotNull(value))
+      endDateCopy.end_date_error = "End date cannot be empty.";
+    else if (
+      Util.isNotNull(EditedTask.start_date) &&
+      dayjs(value).isBefore(dayjs(EditedTask.start_date))
+    ) {
+      endDateCopy.end_date_error = "End date cannot be before start date.";
+    }
+    setEditedTask(endDateCopy);
+    return endDateCopy.end_date_error === "";
+  }
+
+  function onAssignedChange(id: number) {
+    const copyState = { ...EditedTask };
+    copyState.assigned_to_id = id;
+    setEditedTask(copyState);
   }
 
   function handleCloseModal() {
@@ -77,6 +129,9 @@ const TaskModal = ({ isOpen, setisOpen, boardId, setBoard }: Props) => {
         name: EditedTask.name,
         description: EditedTask.description,
         boardId: boardId,
+        start_date: EditedTask.start_date,
+        end_date: EditedTask.end_date,
+        assigned_to_id: EditedTask.assigned_to_id,
       });
 
       if (res.status >= 200 && res.status < 400) {
@@ -138,7 +193,7 @@ const TaskModal = ({ isOpen, setisOpen, boardId, setBoard }: Props) => {
                 }
               />
               <div className="flex flex-row justify-end gap-4 pt-4 h-[62px]">
-                {isTaskEdited && (
+                {isTaskEdited && Util.isNotNull(EditedTask.name) && (
                   <>
                     <DialogClose asChild>
                       <VariantBtn
@@ -152,7 +207,33 @@ const TaskModal = ({ isOpen, setisOpen, boardId, setBoard }: Props) => {
                 )}
               </div>
             </div>
-            <div className="flex flex-col border-l-4 w-[400px] h-full"></div>
+            <div className="flex flex-col gap-4 pt-6 pl-4 border-l-4 w-[400px] h-full">
+              <AdvDatePicker
+                label="Start Date"
+                placeholder="Select Start Date"
+                value={EditedTask.start_date}
+                onChange={(date) => onStartDateChange(date)}
+                error={EditedTask.start_date_error}
+                id="start-date"
+                minDate={new Date()}
+              />
+              <AdvDatePicker
+                label="End Date"
+                placeholder="Select End Date"
+                value={EditedTask.end_date}
+                onChange={(date) => onEndDateChange(date)}
+                error={EditedTask.end_date_error}
+                id="end-date"
+                minDate={EditedTask.start_date ?? new Date()}
+              />
+              <AdvSelect
+                options={assignables}
+                value={EditedTask.assigned_to_id}
+                onChange={onAssignedChange}
+                label="Assigned to"
+                placeholder="Assign a user"
+              />
+            </div>
           </div>
         </DialogContent>
       </form>

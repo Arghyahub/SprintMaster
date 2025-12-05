@@ -9,7 +9,9 @@ class TaskEntity {
   stage_id: number;
   board_stage: BoardStageEntity;
   start_date?: Date;
+  start_date_error?: string;
   end_date?: Date;
+  end_date_error?: string;
   board_id: number;
   board: BoardEntity;
   assigned_to_id?: number;
@@ -25,6 +27,8 @@ class TaskEntity {
     this.name = "";
     this.description = "";
     this.name_error = "";
+    this.start_date_error = "";
+    this.end_date_error = "";
   }
 }
 

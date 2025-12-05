@@ -173,6 +173,20 @@ const getBoard = async (req: Request, res: Response) => {
         boardStages: {
           include: {
             tasks: {
+              include: {
+                assigned_to_user: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+                created_by_user: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+              },
               orderBy: {
                 order: "asc",
               },
@@ -222,7 +236,15 @@ const getBoard = async (req: Request, res: Response) => {
 
 const createUpdateTask = async (req: Request, res: Response) => {
   try {
-    const { name, description, boardId, id } = req.body || {};
+    const {
+      name,
+      description,
+      boardId,
+      id,
+      start_date,
+      end_date,
+      assigned_to_id,
+    } = req.body || {};
 
     const nullValues = Util.nullValues({ name, boardId });
     if (nullValues.length > 0) {
@@ -266,6 +288,11 @@ const createUpdateTask = async (req: Request, res: Response) => {
           board_id: Number(boardId),
           stage_id: stage.id,
           order: totalTasks,
+          start_date: Util.isNotNull(start_date) ? start_date : null,
+          end_date: Util.isNotNull(end_date) ? end_date : null,
+          assigned_to_id: Util.isNotNull(assigned_to_id)
+            ? assigned_to_id
+            : null,
         },
         select: {
           id: true,
@@ -274,7 +301,7 @@ const createUpdateTask = async (req: Request, res: Response) => {
 
       const board = await prisma.board.findUnique({
         where: {
-          id: Number(boardId),
+          id: Number(id),
           relationUserBoards: {
             some: { user_id: req.user.id },
           },
@@ -282,10 +309,38 @@ const createUpdateTask = async (req: Request, res: Response) => {
         include: {
           boardStages: {
             include: {
-              tasks: true,
+              tasks: {
+                include: {
+                  assigned_to_user: {
+                    select: {
+                      id: true,
+                      name: true,
+                    },
+                  },
+                  created_by_user: {
+                    select: {
+                      id: true,
+                      name: true,
+                    },
+                  },
+                },
+                orderBy: {
+                  order: "asc",
+                },
+              },
             },
             orderBy: {
               order: "asc",
+            },
+          },
+          relationUserBoards: {
+            select: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
             },
           },
         },
