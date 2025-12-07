@@ -262,6 +262,8 @@ const getCompanyUser = async (req: Request, res: Response) => {
         message: "User not found",
       });
 
+    companyUser.password = "";
+
     return Api.response({
       res,
       status: 200,

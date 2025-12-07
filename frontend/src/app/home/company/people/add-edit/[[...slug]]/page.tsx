@@ -191,30 +191,32 @@ const page = (props: Props) => {
           id="user_role"
           onChange={handleRoleChange}
         />
-        <AdvInput
-          type={ShowPassword ? "text" : "password"}
-          label="Password *"
-          value={UserState.password}
-          error={UserState.password_error}
-          id="user_password"
-          placeholder="Enter password"
-          onChange={(e) => handlePasswordChange(e.target.value)}
-          SuffixIcon={
-            ShowPassword ? (
-              <EyeOff
-                onClick={() => setShowPassword((prev) => !prev)}
-                strokeWidth={1.2}
-                className="cursor-pointer"
-              />
-            ) : (
-              <Eye
-                onClick={() => setShowPassword((prev) => !prev)}
-                strokeWidth={1.2}
-                className="cursor-pointer"
-              />
-            )
-          }
-        />
+        {!Util.isNotNull(editingId) && (
+          <AdvInput
+            type={ShowPassword ? "text" : "password"}
+            label="Password *"
+            value={UserState.password}
+            error={UserState.password_error}
+            id="user_password"
+            placeholder="Enter password"
+            onChange={(e) => handlePasswordChange(e.target.value)}
+            SuffixIcon={
+              ShowPassword ? (
+                <EyeOff
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  strokeWidth={1.2}
+                  className="cursor-pointer"
+                />
+              ) : (
+                <Eye
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  strokeWidth={1.2}
+                  className="cursor-pointer"
+                />
+              )
+            }
+          />
+        )}
       </div>
       <div className="flex mt-2">
         <VariantBtn
