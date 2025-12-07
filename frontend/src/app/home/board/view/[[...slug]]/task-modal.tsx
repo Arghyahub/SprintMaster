@@ -149,6 +149,7 @@ const TaskModal = ({ isOpen, setisOpen, boardId, setBoard, users }: Props) => {
     if (!Util.isNotNull(EditedTask.name)) return;
     try {
       const res = await Api.post("/board/task/create-update", {
+        id: taskId,
         name: EditedTask.name,
         description: EditedTask.description,
         boardId: boardId,
@@ -204,7 +205,7 @@ const TaskModal = ({ isOpen, setisOpen, boardId, setBoard, users }: Props) => {
               />
               <AdvInput
                 type="text-area"
-                className="w-full h-full overflow-y-auto text-md"
+                className="w-full h-full overflow-y-auto text-xl font-medium p-4"
                 layoutClassName="h-full"
                 placeholder="Task description here..."
                 value={EditedTask?.description}
@@ -225,7 +226,9 @@ const TaskModal = ({ isOpen, setisOpen, boardId, setBoard, users }: Props) => {
                         onClick={handleCloseModal}
                       />
                     </DialogClose>
-                    <VariantBtn label="Save" onClick={handleSubmitTask} />
+                    <DialogClose asChild>
+                      <VariantBtn label="Save" onClick={handleSubmitTask} />
+                    </DialogClose>
                   </>
                 )}
               </div>

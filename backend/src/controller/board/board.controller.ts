@@ -256,6 +256,18 @@ const createUpdateTask = async (req: Request, res: Response) => {
     }
 
     if (Util.isNotNull(id)) {
+      await prisma.task.update({
+        where: {
+          id: Number(id),
+        },
+        data: {
+          name,
+          description,
+          start_date,
+          end_date,
+          assigned_to_id,
+        },
+      });
     } else {
       const stage = await prisma.boardStage.findFirst({
         where: {
@@ -298,61 +310,61 @@ const createUpdateTask = async (req: Request, res: Response) => {
           id: true,
         },
       });
-
-      const board = await prisma.board.findUnique({
-        where: {
-          id: Number(boardId),
-          relationUserBoards: {
-            some: { user_id: req.user.id },
-          },
-        },
-        include: {
-          boardStages: {
-            include: {
-              tasks: {
-                include: {
-                  assigned_to_user: {
-                    select: {
-                      id: true,
-                      name: true,
-                    },
-                  },
-                  created_by_user: {
-                    select: {
-                      id: true,
-                      name: true,
-                    },
-                  },
-                },
-                orderBy: {
-                  order: "asc",
-                },
-              },
-            },
-            orderBy: {
-              order: "asc",
-            },
-          },
-          relationUserBoards: {
-            select: {
-              user: {
-                select: {
-                  id: true,
-                  name: true,
-                },
-              },
-            },
-          },
-        },
-      });
-
-      return Api.response({
-        res,
-        status: 200,
-        message: "Task created successfully",
-        payload: board,
-      });
     }
+
+    const board = await prisma.board.findUnique({
+      where: {
+        id: Number(boardId),
+        relationUserBoards: {
+          some: { user_id: req.user.id },
+        },
+      },
+      include: {
+        boardStages: {
+          include: {
+            tasks: {
+              include: {
+                assigned_to_user: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+                created_by_user: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+              },
+              orderBy: {
+                order: "asc",
+              },
+            },
+          },
+          orderBy: {
+            order: "asc",
+          },
+        },
+        relationUserBoards: {
+          select: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return Api.response({
+      res,
+      status: 200,
+      message: `Task ${Util.isNotNull(id) ? "updated" : "crated"} successfully`,
+      payload: board,
+    });
   } catch (error) {
     console.log("error ", error);
     return Api.response({
