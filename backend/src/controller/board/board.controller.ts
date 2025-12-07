@@ -301,7 +301,7 @@ const createUpdateTask = async (req: Request, res: Response) => {
 
       const board = await prisma.board.findUnique({
         where: {
-          id: Number(id),
+          id: Number(boardId),
           relationUserBoards: {
             some: { user_id: req.user.id },
           },

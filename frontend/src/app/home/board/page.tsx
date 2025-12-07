@@ -93,12 +93,20 @@ const page = (props: Props) => {
                       outerRadius: "150%",
                       data: [
                         {
-                          label: "Completed Tasks",
+                          label: `Completed Tasks ${(
+                            ((board?.completed_tasks ?? 0) /
+                              (board?.total_tasks ?? 1)) *
+                            100
+                          ).toFixed(2)}%`,
                           value: board?.completed_tasks ?? 0,
                           color: "#00c951",
                         },
                         {
-                          label: "Pending Tasks",
+                          label: `Pending Tasks ${(
+                            ((board?.pending_tasks ?? 0) /
+                              (board?.total_tasks ?? 1)) *
+                            100
+                          ).toFixed(2)}%`,
                           value: board?.pending_tasks ?? 0,
                           color: "#ffba00",
                         },

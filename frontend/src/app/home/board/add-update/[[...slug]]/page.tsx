@@ -259,6 +259,9 @@ const page = (props: Props) => {
     if (!Util.isNotNull(editingId) && !permissions?.add) {
       router.push("/home/board");
     }
+    if (Util.isNotNull(editingId) && !permissions?.edit) {
+      router.push("/home/board");
+    }
     getCompanyUsers();
   }, [editingId]);
 

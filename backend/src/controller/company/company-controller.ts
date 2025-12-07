@@ -103,6 +103,13 @@ const getDashboardData = async (req: Request, res: Response) => {
     });
 
     if (!Util.isNotNull(company?.id)) {
+      if (req.user.user_type == "super_admin") {
+        return Api.response({
+          res,
+          status: 200,
+          message: "Admin check pass.",
+        });
+      }
       return Api.response({
         res,
         status: 400,
