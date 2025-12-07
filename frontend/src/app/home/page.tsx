@@ -66,7 +66,7 @@ const page = (props: Props) => {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-3xl">Dashboard</h1>
+      <h1 className="text-3xl  mb-2">Dashboard</h1>
       {permissions?.board_management && <p>board_management</p>}
       {permissions?.pending_tasks && <p>pending_tasks</p>}
       {permissions?.user_management && <p>user_management</p>}

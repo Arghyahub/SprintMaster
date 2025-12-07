@@ -122,7 +122,7 @@ const page = (props: Props) => {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="font-bold text-2xl">Company Setup</h1>
+      <h1 className="font-bold text-3xl mb-2">Company Setup</h1>
       <div className="flex flex-row gap-4 w-full">
         <AdvInput
           label="Name *"

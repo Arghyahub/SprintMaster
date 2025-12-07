@@ -160,7 +160,7 @@ const page = (props: Props) => {
 
   return (
     <div className="flex flex-col gap-6 w-full h-full">
-      <h1 className="font-medium text-3xl">
+      <h1 className="font-medium text-3xl mb-2">
         {editingId ? "Edit User" : "Add User"}
       </h1>
 

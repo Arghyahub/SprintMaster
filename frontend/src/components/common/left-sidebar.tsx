@@ -224,9 +224,9 @@ const LeftSidebar = (props: Props) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
             <DropdownMenuItem onClick={Util.logout}>Logout</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => router.push("/home/profile")}>
+            {/* <DropdownMenuItem onClick={() => router.push("/home/profile")}>
               Profile
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
             {/* <DropdownMenuItem>Profile</DropdownMenuItem> */}
           </DropdownMenuContent>
         </DropdownMenu>

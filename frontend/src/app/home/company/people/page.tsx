@@ -94,8 +94,8 @@ const page = (props: Props) => {
 
   return (
     <div className="flex flex-col gap-4 w-full h-full">
-      <div className="flex flex-row justify-between">
-        <h1 className="font-medium text-3xl">Manage People</h1>
+      <div className="flex flex-row justify-between mb-2">
+        <h1 className="text-3xl">Manage People</h1>
         <VariantBtn
           onClick={() => router.push("/home/company/people/add-edit")}
           label="Add People"
