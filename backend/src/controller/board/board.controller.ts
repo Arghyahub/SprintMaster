@@ -364,6 +364,65 @@ const createUpdateTask = async (req: Request, res: Response) => {
   }
 };
 
+const getTask = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params || {};
+    const nullValues = Util.nullValues({ id });
+    if (nullValues.length > 0) {
+      return Api.response({
+        res,
+        success: false,
+        status: 400,
+        message: `Missing required fields ${Util.formatKeys(nullValues)}`,
+      });
+    }
+
+    const task = await prisma.task.findUnique({
+      where: {
+        id: Number(id),
+      },
+      include: {
+        assigned_to_user: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        created_by_user: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!task) {
+      return Api.response({
+        res,
+        success: false,
+        status: 404,
+        message: "Task not found",
+      });
+    }
+
+    return Api.response({
+      res,
+      status: 200,
+      message: "Task fetched successfully",
+      payload: task,
+    });
+  } catch (error) {
+    console.log("error ", error);
+    return Api.response({
+      res,
+      message: "Internal server error",
+      error: error?.message ?? "",
+      status: 500,
+    });
+  }
+};
+
 const moveTask = async (req: Request, res: Response) => {
   try {
     const { taskId, stageId, index } = req.body || {};
@@ -418,6 +477,7 @@ const boardController = {
   createUpdateBoard,
   getBoard,
   createUpdateTask,
+  getTask,
   moveTask,
 };
 

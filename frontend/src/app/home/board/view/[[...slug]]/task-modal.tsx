@@ -64,7 +64,30 @@ const TaskModal = ({ isOpen, setisOpen, boardId, setBoard, users }: Props) => {
   async function handleOpenModal(id: number) {
     setisOpen(true);
     try {
-    } catch (error) {}
+      const res = await Api.get(`/board/task/${id}`);
+      if (res.data?.success) {
+        const data = res?.data?.payload;
+        if (!data) {
+          toast.error("Task not found");
+          return;
+        }
+        setTaskState({
+          ...data,
+          start_date: new Date(data.start_date),
+          end_date: new Date(data?.end_date),
+        });
+        setEditedTask({
+          ...data,
+          start_date: new Date(data.start_date),
+          end_date: new Date(data?.end_date),
+        });
+      } else {
+        toast.error(res.data?.message ?? "Internal server error");
+      }
+    } catch (error) {
+      console.log("error ", error);
+      toast.error(error?.message ?? "Something went wrong");
+    }
   }
 
   function onStartDateChange(value: Date): boolean {
