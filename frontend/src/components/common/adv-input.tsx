@@ -38,7 +38,7 @@ const AdvInput = ({
   name,
   id,
   SuffixIcon,
-  maxLength = 250,
+  maxLength,
   additionalProps = {},
   props,
 }: Props) => {
@@ -79,7 +79,7 @@ const AdvInput = ({
                 (e.target as HTMLElement).blur();
               }
             }}
-            maxLength={maxLength}
+            maxLength={maxLength ?? 500}
             className={cn(
               "p-2 border border-slate-300 rounded w-full",
               { "border-r-0 rounded-r-none": !!SuffixIcon },
@@ -102,7 +102,7 @@ const AdvInput = ({
                 (e.target as HTMLElement).blur();
               }
             }}
-            maxLength={maxLength}
+            maxLength={maxLength ?? 250}
             className={cn(
               "p-2 border border-slate-300 rounded w-full",
               { "border-r-0 rounded-r-none": !!SuffixIcon },
