@@ -9,6 +9,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { PieChart } from "@mui/x-charts/PieChart";
+
+const data = [
+  { label: "Group A", value: 400 },
+  { label: "Group B", value: 300 },
+  { label: "Group C", value: 300 },
+  { label: "Group D", value: 200 },
+];
 
 type Props = {};
 
@@ -60,14 +68,38 @@ const page = (props: Props) => {
       {Data.length === 0 ? (
         <p>No boards available. Create one today</p>
       ) : (
-        <div className="flex flex-row flex-wrap gap-4 w-full h-full">
+        <div className="flex flex-row flex-wrap gap-6 w-full h-full">
           {Data.map((board) => (
             <Link
               href={`/home/board/view/${board.id}`}
               key={board.id}
-              className="flex flex-col gap-2 p-4 border rounded-lg"
+              className="flex flex-col items-center gap-2 p-4 border rounded-lg bg-slate-100"
             >
-              <p>{board.name}</p>
+              <PieChart
+                series={[
+                  {
+                    startAngle: -90,
+                    endAngle: 90,
+                    paddingAngle: 5,
+                    innerRadius: "60%",
+                    outerRadius: "150%",
+                    data: [
+                      {
+                        label: "Completed Tasks",
+                        value: board?.completed_tasks ?? 0,
+                      },
+                      {
+                        label: "Pending Tasks",
+                        value: board?.pending_tasks ?? 0,
+                      },
+                    ],
+                    cy: "85%",
+                  },
+                ]}
+                hideLegend
+              />
+              <p className="text-xl font-medium text-teal-900">{board.name}</p>
+              {/* <p>{board.name}</p>
               <div className="border w-full"></div>
               <div className="flex flex-row justify-between">
                 <table>
@@ -84,7 +116,7 @@ const page = (props: Props) => {
                     <td>{board?.total_tasks ?? ""}</td>
                   </tr>
                 </table>
-              </div>
+              </div> */}
             </Link>
           ))}
         </div>
