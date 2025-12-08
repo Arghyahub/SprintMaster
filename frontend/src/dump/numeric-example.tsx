@@ -17,8 +17,8 @@ const page = (props: Props) => {
   const [NumberIp, setNumberIp] = useState("");
 
   function handleNumOnChange(value: string) {
-    const { breakInput, error } = numValidator(value);
-    if (breakInput) return;
+    const { breakOnchange, error } = numValidator(value);
+    if (breakOnchange) return;
     setErr(error);
     setNumberIp(value?.trim());
   }
