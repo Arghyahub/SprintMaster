@@ -21,11 +21,6 @@ enum UserTypeEnum {
   super_admin
 }
 
-// enum UserStatus {
-//   active
-//   deactive
-//   in_review
-// }
 
 model User {
   id                   Int                 @id @default(autoincrement())
