@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt, { type SignOptions } from "jsonwebtoken";
 import Env from "../config/env";
-import { UserTypeEnum } from "../generated/prisma";
+import { UserTypeEnum } from "@prisma/client";
 
 class Cryptr {
   static async hashPassword(password: string) {

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import Api from "../util/api";
-import { UserTypeEnum } from "../generated/prisma";
+import { UserTypeEnum } from "@prisma/client";
 
 function roleMiddlewareGenerator(roleList: UserTypeEnum[]) {
   const roleCheckMiddleware = (
