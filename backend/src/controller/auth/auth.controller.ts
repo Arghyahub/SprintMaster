@@ -81,7 +81,7 @@ async function signUp(req: Request, res: Response) {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: !Util.isDevEnv(),
-      sameSite: "lax",
+      sameSite: "none",
       path: "/api/auth",
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
@@ -154,7 +154,7 @@ async function login(req: Request, res: Response) {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: !Util.isDevEnv(),
-      sameSite: "lax",
+      sameSite: "none",
       path: "/api/auth",
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
@@ -198,7 +198,7 @@ async function refresh(req: Request, res: Response) {
       res.clearCookie("refreshToken", {
         httpOnly: true,
         secure: !Util.isDevEnv(),
-        sameSite: "lax",
+        sameSite: "none",
         path: "/api/auth",
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       });
@@ -208,7 +208,7 @@ async function refresh(req: Request, res: Response) {
     res.clearCookie("refreshToken", {
       httpOnly: true,
       secure: !Util.isDevEnv(),
-      sameSite: "lax",
+      sameSite: "none",
       path: "/api/auth",
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
@@ -232,7 +232,7 @@ async function refresh(req: Request, res: Response) {
     res.clearCookie("refreshToken", {
       httpOnly: true,
       secure: !Util.isDevEnv(),
-      sameSite: "lax",
+      sameSite: "none",
       path: "/api/auth",
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
@@ -277,7 +277,7 @@ async function refresh(req: Request, res: Response) {
     // res.cookie("refreshToken", newRefreshToken, {
     //   httpOnly: true,
     //   secure: !Util.isDevEnv(),
-    //   sameSite: "lax",
+    //   sameSite: "none",
     //   path: "/api/auth",
     //   maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     // });
@@ -305,7 +305,7 @@ async function logout(req: Request, res: Response) {
   res.clearCookie("refreshToken", {
     httpOnly: true,
     secure: !Util.isDevEnv(),
-    sameSite: "lax",
+    sameSite: "none",
     path: "/api/auth",
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
   });
