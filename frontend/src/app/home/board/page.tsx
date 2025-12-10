@@ -110,6 +110,15 @@ const page = (props: Props) => {
                           value: board?.pending_tasks ?? 0,
                           color: "#ffba00",
                         },
+                        ...(board?.total_tasks == 0 && board?.pending_tasks == 0
+                          ? [
+                              {
+                                label: `No Tasks created`,
+                                value: 1,
+                                color: "#2b7fff",
+                              },
+                            ]
+                          : []),
                       ],
                       cy: "85%",
                     },

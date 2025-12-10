@@ -18,6 +18,7 @@ const getBoardSummary = async (req: Request, res: Response) => {
     INNER JOIN "RelationUserBoard" rub ON b.id = rub.board_id
     WHERE rub.user_id = ${req.user.id}
     GROUP BY b.id, b.name
+    ORDER BY b.created_at DESC
     `;
 
     return Api.response({
