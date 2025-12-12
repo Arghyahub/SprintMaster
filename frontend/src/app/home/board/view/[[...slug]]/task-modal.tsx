@@ -39,7 +39,7 @@ const defaultTask = new TaskEntity();
 
 const TaskModal = ({ isOpen, setisOpen, boardId, setBoard, users }: Props) => {
   const router = useRouter();
-  const [showSkeleton, setshowSkeleton] = useState(false);
+  const [IsSubmitting, setIsSubmitting] = useState(false);
   const [TaskState, setTaskState] = useState(defaultTask);
   const [EditedTask, setEditedTask] = useState(defaultTask);
 
@@ -148,6 +148,7 @@ const TaskModal = ({ isOpen, setisOpen, boardId, setBoard, users }: Props) => {
   async function handleSubmitTask() {
     if (!Util.isNotNull(EditedTask.name)) return;
     try {
+      setIsSubmitting(true);
       const res = await Api.post("/board/task/create-update", {
         id: taskId,
         name: EditedTask.name,
@@ -166,6 +167,9 @@ const TaskModal = ({ isOpen, setisOpen, boardId, setBoard, users }: Props) => {
       }
     } catch (error) {
       console.log("error ", error);
+    } finally {
+      setIsSubmitting(false);
+      handleCloseModal();
     }
   }
 
@@ -191,6 +195,7 @@ const TaskModal = ({ isOpen, setisOpen, boardId, setBoard, users }: Props) => {
                 className="border-none focus:outline-0 font-semibold text-3xl"
                 placeholder="Task Tittle"
                 value={EditedTask.name}
+                maxLength={150}
                 onChange={(e) =>
                   setEditedTask((prev) => ({
                     ...prev,
@@ -226,9 +231,11 @@ const TaskModal = ({ isOpen, setisOpen, boardId, setBoard, users }: Props) => {
                         onClick={handleCloseModal}
                       />
                     </DialogClose>
-                    <DialogClose asChild>
-                      <VariantBtn label="Save" onClick={handleSubmitTask} />
-                    </DialogClose>
+                    <VariantBtn
+                      label="Save"
+                      onClick={handleSubmitTask}
+                      isLoading={IsSubmitting}
+                    />
                   </>
                 )}
               </div>
