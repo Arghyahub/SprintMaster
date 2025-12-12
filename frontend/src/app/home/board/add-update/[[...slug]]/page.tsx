@@ -114,7 +114,7 @@ const page = (props: Props) => {
     BoardStageOptions.development
   );
   const [BoardStatus, setBoardStatus] = useState({
-    value: "upcoming",
+    value: "active",
     error: "",
   });
   const [IsSubmitting, setIsSubmitting] = useState(false);
@@ -322,14 +322,14 @@ const page = (props: Props) => {
           error={BoardName.error}
           id="board-name"
         />
-        <AdvSelect
+        {/* <AdvSelect
           options={BoardStatusOptions.filter(
             (item) => !(item.value == "completed" && !editingId)
           )}
           value={BoardStatus.value}
           onChange={onStatusChange}
           label="Board Status"
-        />
+        /> */}
         <AdvDatePicker
           label="Start Date"
           placeholder="Select Start Date"

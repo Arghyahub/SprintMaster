@@ -3,6 +3,7 @@ import Loader from "@/components/common/loader";
 import BoardEntity from "@/types/entities/board=entity";
 import Api from "@/utils/api";
 import {
+  closestCorners,
   DndContext,
   DragEndEvent,
   DragOverlay,
@@ -140,6 +141,7 @@ const page = (props: Props) => {
       <div className="flex flex-row gap-4 w-full h-full overflow-x-auto hide-scrollbar">
         <DndContext
           sensors={sensors}
+          collisionDetection={closestCorners}
           onDragEnd={handleDragEnd}
           onDragStart={
             (event) => {}
