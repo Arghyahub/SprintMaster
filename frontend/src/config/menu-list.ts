@@ -155,8 +155,7 @@ class MenuUtil {
         "access",
         "board_management",
         "user_management",
-        "pending_tasks",
-        // "analytics",
+        "task_management",
       ],
     },
     // Super Admin is Number 1.
@@ -166,13 +165,13 @@ class MenuUtil {
       icon: UserStar,
       type: "parent",
       children: [
-        {
-          id: 2,
-          title: "Users",
-          icon: User,
-          path: "/home/super-admin/user",
-          access: ["access"],
-        },
+        // {
+        //   id: 2,
+        //   title: "Users",
+        //   icon: User,
+        //   path: "/home/super-admin/user",
+        //   access: ["access"],
+        // },
         {
           id: 3,
           title: "Role",
