@@ -9,9 +9,9 @@ const getBoardSummary = async (req: Request, res: Response) => {
     SELECT 
       b.name,
       b.id,
-      COUNT(t.id) FILTER (WHERE bs.is_final = false)::numeric AS pending_tasks,
-      COUNT(t.id)::numeric AS total_tasks,
-      COUNT(t.id) FILTER (WHERE bs.is_final = true)::numeric AS completed_tasks
+      COUNT(t.id) FILTER (WHERE bs.is_final = false)::integer AS pending_tasks,
+      COUNT(t.id)::integer AS total_tasks,
+      COUNT(t.id) FILTER (WHERE bs.is_final = true)::integer AS completed_tasks
     FROM "Board" b
     LEFT JOIN "BoardStage" bs ON b.id = bs.board_id
     LEFT JOIN "Task" t ON bs.id = t.stage_id
@@ -42,7 +42,7 @@ const createUpdateBoard = async (req: Request, res: Response) => {
   try {
     const { id, name, start_date, end_date, status, user_ids } = req.body;
     const { stages } = req.body as {
-      stages: { label: string; is_final: boolean }[];
+      stages: { label: string; is_final: boolean; value?: number }[];
     };
 
     const user = await prisma.user.findUnique({
@@ -81,7 +81,7 @@ const createUpdateBoard = async (req: Request, res: Response) => {
         },
       });
 
-      await prisma.board.update({
+      const board = await prisma.board.update({
         where: { id: Number(id) },
         data: {
           name,
@@ -89,15 +89,6 @@ const createUpdateBoard = async (req: Request, res: Response) => {
           end_date,
           status,
           company_id: user.company_id,
-          boardStages: {
-            createMany: {
-              data: stages.map((stage, index) => ({
-                name: stage.label,
-                is_final: stage.is_final,
-                order: index,
-              })),
-            },
-          },
           relationUserBoards: {
             createMany: {
               data: user_ids.map((usr) => ({
@@ -106,7 +97,76 @@ const createUpdateBoard = async (req: Request, res: Response) => {
             },
           },
         },
+        select: {
+          boardStages: {
+            select: {
+              id: true,
+              name: true,
+            },
+            orderBy: {
+              id: "asc",
+            },
+          },
+        },
       });
+
+      type stageIdx = (typeof stages)[number] & { index: number };
+
+      const pExistingStages: stageIdx[] = [],
+        pNewStages: stageIdx[] = [];
+
+      stages.forEach((st, index) => {
+        if (Util.isNotNull(st.value)) {
+          pExistingStages.push({ ...st, index });
+        } else {
+          pNewStages.push({ ...st, index });
+        }
+      });
+      console.log(pExistingStages);
+      console.log(board.boardStages);
+
+      pExistingStages.sort((a, b) => a.value - b.value);
+      if (pExistingStages.length !== board.boardStages.length) {
+        return Api.response({
+          res,
+          status: 400,
+          message: "Unable to update stages, refresh the page and try again.",
+        });
+      }
+
+      for (let i = 0; i < pExistingStages.length; i++) {
+        if (pExistingStages[i].value !== board.boardStages[i].id) {
+          return Api.response({
+            res,
+            status: 400,
+            message: "Unable to update stages, refresh the page and try again.",
+          });
+        }
+      }
+
+      await prisma.boardStage.createMany({
+        data: pNewStages.map((st) => ({
+          name: st.label,
+          is_final: st.is_final,
+          order: st.index,
+          board_id: Number(id),
+        })),
+      });
+
+      const proms = pExistingStages.map((st) => {
+        return prisma.boardStage.update({
+          where: {
+            id: Number(st.value),
+          },
+          data: {
+            name: st.label,
+            is_final: st.is_final,
+            order: st.index,
+          },
+        });
+      });
+
+      await Promise.all(proms);
     } else {
       await prisma.board.create({
         data: {
@@ -133,13 +193,12 @@ const createUpdateBoard = async (req: Request, res: Response) => {
           },
         },
       });
-
-      return Api.response({
-        res,
-        status: 201,
-        message: "Board created successfully.",
-      });
     }
+    return Api.response({
+      res,
+      status: 201,
+      message: `Board ${id ? "updated" : "created"} successfully.`,
+    });
   } catch (error) {
     console.error("Error creating/updating board:", error);
     return Api.response({
@@ -153,13 +212,64 @@ const createUpdateBoard = async (req: Request, res: Response) => {
 
 const getBoard = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params || {};
+    const { edit_detail } = req.query || {};
 
     if (!Util.isNotNull(id)) {
       return Api.response({
         res,
         status: 400,
         message: "Board ID not required.",
+      });
+    }
+
+    // For board edit page
+    if (edit_detail) {
+      const board = await prisma.board.findUnique({
+        where: {
+          id: Number(id),
+          relationUserBoards: {
+            some: { user_id: req.user.id },
+          },
+        },
+        select: {
+          name: true,
+          start_date: true,
+          end_date: true,
+          status: true,
+          boardStages: {
+            select: {
+              id: true,
+              name: true,
+              is_final: true,
+              order: true,
+            },
+            orderBy: {
+              order: "asc",
+            },
+          },
+          relationUserBoards: {
+            select: {
+              id: true,
+              user_id: true,
+            },
+          },
+        },
+      });
+
+      if (!board) {
+        return Api.response({
+          res,
+          status: 404,
+          message: "Board not found.",
+        });
+      }
+
+      return Api.response({
+        res,
+        status: 200,
+        message: "Board fetched successfully.",
+        payload: board,
       });
     }
 

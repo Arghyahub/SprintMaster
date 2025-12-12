@@ -21,7 +21,6 @@ enum UserTypeEnum {
   super_admin
 }
 
-
 model User {
   id                   Int                 @id @default(autoincrement())
   name                 String
@@ -104,8 +103,6 @@ model BoardStage {
   name     String
   board    Board   @relation(fields: [board_id], references: [id])
   tasks    Task[]
-
-  @@unique([board_id, order])
 }
 
 model Task {

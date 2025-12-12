@@ -92,24 +92,34 @@ const page = (props: Props) => {
                       innerRadius: "60%",
                       outerRadius: "150%",
                       data: [
-                        {
-                          label: `Completed Tasks ${(
-                            ((board?.completed_tasks ?? 0) /
-                              (board?.total_tasks ?? 1)) *
-                            100
-                          ).toFixed(2)}%`,
-                          value: board?.completed_tasks ?? 0,
-                          color: "#00c951",
-                        },
-                        {
-                          label: `Pending Tasks ${(
-                            ((board?.pending_tasks ?? 0) /
-                              (board?.total_tasks ?? 1)) *
-                            100
-                          ).toFixed(2)}%`,
-                          value: board?.pending_tasks ?? 0,
-                          color: "#ffba00",
-                        },
+                        ...(Number.isInteger(board?.completed_tasks) &&
+                        board?.completed_tasks > 0
+                          ? [
+                              {
+                                label: `Completed Tasks ${(
+                                  ((board?.completed_tasks ?? 0) /
+                                    (board?.total_tasks ?? 1)) *
+                                  100
+                                ).toFixed(2)}%`,
+                                value: board?.completed_tasks ?? 0,
+                                color: "#00c951",
+                              },
+                            ]
+                          : []),
+                        ...(Number.isInteger(board?.pending_tasks) &&
+                        board?.pending_tasks > 0
+                          ? [
+                              {
+                                label: `Pending Tasks ${(
+                                  ((board?.pending_tasks ?? 0) /
+                                    (board?.total_tasks ?? 1)) *
+                                  100
+                                ).toFixed(2)}%`,
+                                value: board?.pending_tasks ?? 0,
+                                color: "#ffba00",
+                              },
+                            ]
+                          : []),
                         ...(board?.total_tasks == 0 && board?.pending_tasks == 0
                           ? [
                               {

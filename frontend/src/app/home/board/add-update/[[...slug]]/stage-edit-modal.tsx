@@ -24,6 +24,7 @@ type ModalStateType = {
   label: string;
   is_final: boolean;
   name_error: string;
+  value?: number;
 };
 
 type Props = {
@@ -40,7 +41,9 @@ type Props = {
   BoardStages: {
     label: string;
     is_final: boolean;
+    value?: number;
   }[];
+  editingId: number;
 };
 
 const StageEditModal = ({
@@ -48,6 +51,7 @@ const StageEditModal = ({
   setModalState,
   BoardStages,
   setBoardStages,
+  editingId,
 }: Props) => {
   function onNameChange(value: string): boolean {
     const copyState = { ...ModalState };
@@ -68,6 +72,7 @@ const StageEditModal = ({
       stages[ModalState.stageIndex] = {
         label: ModalState.label,
         is_final: ModalState.is_final,
+        value: ModalState?.value,
       };
     }
 
@@ -126,13 +131,15 @@ const StageEditModal = ({
             </div>
           </div>
           <DialogFooter className="flex flex-row gap-4 mt-4">
-            <DialogClose asChild>
-              <VariantBtn
-                label="Delete"
-                onClick={handleStageDelete}
-                variant="danger"
-              />
-            </DialogClose>
+            {!Util.isNotNull(editingId) && (
+              <DialogClose asChild>
+                <VariantBtn
+                  label="Delete"
+                  onClick={handleStageDelete}
+                  variant="danger"
+                />
+              </DialogClose>
+            )}
             <VariantBtn
               label="Save"
               type="submit"

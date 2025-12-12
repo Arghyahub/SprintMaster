@@ -18,10 +18,11 @@ import { Tooltip } from "react-tooltip";
 import StageDivider from "./stage-divider";
 
 type Props = {
-  BoardStages: { label: string; is_final: boolean }[];
+  BoardStages: { label: string; is_final: boolean; value?: number }[];
   setBoardStages: React.Dispatch<
-    React.SetStateAction<{ label: string; is_final: boolean }[]>
+    React.SetStateAction<{ label: string; is_final: boolean; value?: number }[]>
   >;
+  editingId: number;
 };
 
 export const defaultModalState = {
@@ -30,9 +31,10 @@ export const defaultModalState = {
   label: "",
   is_final: false,
   name_error: "",
+  value: undefined,
 };
 
-const StageComponent = ({ BoardStages, setBoardStages }: Props) => {
+const StageComponent = ({ BoardStages, setBoardStages, editingId }: Props) => {
   const [ModalState, setModalState] = useState(defaultModalState);
   const [activeIdx, setActiveIdx] = useState(-1);
 
@@ -173,6 +175,7 @@ const StageComponent = ({ BoardStages, setBoardStages }: Props) => {
         setModalState={setModalState}
         setBoardStages={setBoardStages}
         BoardStages={BoardStages}
+        editingId={editingId}
       />
     </div>
   );

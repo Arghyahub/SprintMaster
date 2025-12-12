@@ -23,6 +23,7 @@ import {
   OutlinedInput,
   Select,
 } from "@mui/material";
+import BoardEntity from "@/types/entities/board=entity";
 
 type Props = {};
 
@@ -77,6 +78,12 @@ const BoardStageOptions = {
   ],
 };
 
+type BoardStageOption = {
+  label: string;
+  is_final: boolean;
+  value?: number;
+};
+
 type BoardStageKey = keyof typeof BoardStageOptions;
 
 const BoardStageSelections = Object.keys(BoardStageOptions).map((key) => ({
@@ -103,7 +110,9 @@ const page = (props: Props) => {
   const [SelectedUsers, setSelectedUsers] = useState<number[]>([user.id]);
   const [BoardStageSelectikon, setBoardStageSelectikon] =
     useState<BoardStageKey>("development");
-  const [BoardStages, setBoardStages] = useState(BoardStageOptions.development);
+  const [BoardStages, setBoardStages] = useState<BoardStageOption[]>(
+    BoardStageOptions.development
+  );
   const [BoardStatus, setBoardStatus] = useState({
     value: "upcoming",
     error: "",
@@ -179,7 +188,6 @@ const page = (props: Props) => {
   }
 
   async function handleSubmit() {
-    console.log("here");
     const validations = [
       onChangeBoardName(BoardName.value),
       onStartDateChange(Startdate.value),
@@ -251,6 +259,35 @@ const page = (props: Props) => {
     }
   }
 
+  async function getBoardData() {
+    try {
+      setIsLoading(true);
+      const res = await Api.get(`/board/${editingId}`, { edit_detail: true });
+      if (res.data.success) {
+        const data = res.data?.payload as BoardEntity;
+        onChangeBoardName(data.name);
+        onStartDateChange(new Date(data.start_date));
+        onEndDateChange(new Date(data.end_date));
+        onStatusChange(data.status);
+        setSelectedUsers(data.relationUserBoards.map((rub) => rub.user_id));
+        setBoardStages(
+          data.boardStages.map((bs) => ({
+            label: bs.name,
+            is_final: bs.is_final,
+            value: bs.id,
+          }))
+        );
+      } else {
+        toast.error(res.data?.message ?? "Unable to fetch board data");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Unable to fetch board data");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   useEffect(() => {
     if (!permissions.access) {
       Util.logout();
@@ -258,9 +295,15 @@ const page = (props: Props) => {
     }
     if (!Util.isNotNull(editingId) && !permissions?.add) {
       router.push("/home/board");
+      return;
     }
     if (Util.isNotNull(editingId) && !permissions?.edit) {
       router.push("/home/board");
+      return;
+    }
+
+    if (Util.isNotNull(editingId)) {
+      getBoardData();
     }
     getCompanyUsers();
   }, [editingId]);
@@ -308,18 +351,21 @@ const page = (props: Props) => {
       </div>
       {/* <div className="flex flex-row gap-6 w-full">
       </div> */}
-      <div className="flex flex-row gap-6 w-full">
-        <AdvSelect
-          options={BoardStageSelections}
-          value={BoardStageSelectikon}
-          onChange={onStageSelectionChange}
-          label="Board Type"
-        />
-      </div>
+      {!Util.isNotNull(editingId) && (
+        <div className="flex flex-row gap-6 w-full">
+          <AdvSelect
+            options={BoardStageSelections}
+            value={BoardStageSelectikon}
+            onChange={onStageSelectionChange}
+            label="Board Type"
+          />
+        </div>
+      )}
       <div className="flex">
         <StageComponent
           BoardStages={BoardStages}
           setBoardStages={setBoardStages}
+          editingId={editingId}
         />
       </div>
 

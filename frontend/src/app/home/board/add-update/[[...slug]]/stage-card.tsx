@@ -5,7 +5,7 @@ import { EllipsisVertical } from "lucide-react";
 import React from "react";
 
 type Props = {
-  stage: { label: string; is_final: boolean };
+  stage: { label: string; is_final: boolean; value?: number };
   index: number;
   setModalState: React.Dispatch<
     React.SetStateAction<{
@@ -14,6 +14,7 @@ type Props = {
       label: string;
       is_final: boolean;
       name_error: string;
+      value?: number;
     }>
   >;
   className?: string;
@@ -47,6 +48,7 @@ const StageCard = ({ stage, index, setModalState, className = "" }: Props) => {
         onClick={() =>
           setModalState({
             isOpen: true,
+            value: stage.value,
             stageIndex: index,
             label: stage.label,
             is_final: stage.is_final,
