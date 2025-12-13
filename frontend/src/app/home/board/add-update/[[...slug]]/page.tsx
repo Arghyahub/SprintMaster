@@ -114,7 +114,7 @@ const page = (props: Props) => {
     BoardStageOptions.development
   );
   const [BoardStatus, setBoardStatus] = useState({
-    value: "active",
+    value: "in_progress",
     error: "",
   });
   const [IsSubmitting, setIsSubmitting] = useState(false);
