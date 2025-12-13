@@ -7,6 +7,7 @@ import LeftSidebar from "@/components/common/left-sidebar";
 import MobileSidebar from "@/components/common/mobile-sidebar";
 import Sidebar from "@/components/common/sidebar";
 import SWRegistrar from "@/components/common/sw-registrar";
+import config from "@/config/config";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,14 +20,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Home for Project",
-  description: "Project Description",
+  title: config.title,
+  description: config.description,
   openGraph: {
-    title: "Home for Project",
-    description: "Project Description",
+    title: config.title,
+    description: config.description,
     type: "website",
     url: "#", // Replace with your actual URL
-    siteName: "Home for Project",
+    siteName: config.title,
   },
 };
 

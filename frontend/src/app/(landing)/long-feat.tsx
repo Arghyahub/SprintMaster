@@ -31,7 +31,7 @@ const LongFeat = ({ index, img, name, description }: Props) => {
           className="rounded-md h-auto size-[300px] md:size-[400px] lg:size-auto"
         />
       </div>
-      <div className="flex-1 gap-4">
+      <div className="flex-1 flex flex-col gap-4">
         <h3 className="mb-2 font-semibold text-gray-800 text-2xl md:text-3xl">
           {name}
         </h3>

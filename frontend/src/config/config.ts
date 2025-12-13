@@ -1,29 +1,46 @@
-import { Anchor } from "lucide-react";
+import { Anchor, Kanban, Users, Shield } from "lucide-react";
 const loremTxt =
   "lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
 
 const config = {
   enable_role_based_access: true,
-  title: "Title",
-  description: "Describes your app in detail",
+  title: "SprintMaster",
+  description: "Manage all your tasks, your routine and you team in one place",
   logo: "/project/projectIcon.svg",
-  moat: "What is your super power",
-  heroImg: "/project/heroImg.jpg",
-  hook2Scroll: "Hook them to scroll",
+  moat: "Productivity at your fingertips",
+  heroImg: "/project/heroImg.png",
+  hook2Scroll: "Everything your team needs to stay aligned",
   shortFeatures: [
-    { name: "Feature 1", description: loremTxt, icon: Anchor },
-    { name: "Feature 2", description: loremTxt, icon: Anchor },
-    { name: "Feature 3", description: loremTxt, icon: Anchor },
+    {
+      name: "Visual Kanban Boards",
+      description:
+        "Drag, drop, and organize tasks across customizable stages with real-time updates.",
+      icon: Kanban,
+    },
+    {
+      name: "Team Collaboration",
+      description:
+        "Assign tasks, add comments, and keep everyone aligned in one shared workspace.",
+      icon: Users,
+    },
+    {
+      name: "Role-Based Access",
+      description:
+        "Control who can view, edit, and manage boards with secure permissions.",
+      icon: Shield,
+    },
   ],
   longFeatures: [
     {
-      name: "Feature 1",
-      description: loremTxt + loremTxt,
+      name: "Multiple & Multidisciplinary Boards",
+      description:
+        "Create multiple boards for different teams, projects, or workflows. Whether it’s engineering, design, marketing, or operations, manage all disciplines independently while keeping everything connected.",
       img: "/project/feat-long.jpg",
     },
     {
-      name: "Feature 2",
-      description: loremTxt + loremTxt,
+      name: "Team Management & Powerful Analytics",
+      description:
+        "Manage teams with clear roles and permissions, track workload distribution, and gain deep insights through analytics on task progress, velocity, and bottlenecks to make better decisions.",
       img: "/project/feat-long.jpg",
     },
   ],
@@ -49,16 +66,17 @@ const config = {
   ],
   faq: [
     {
-      title: "What is this project about?",
+      title: "How is SprintMaster different from Jira?",
       description:
-        "This project is a template for building landing pages with Next.js and Tailwind CSS. It includes features like testimonials, long and short features, and a hero section.",
+        "SprintMaster focuses on simplicity and speed, giving you essential Kanban and sprint features without unnecessary complexity.",
     },
     {
-      title: "Is it accessible?",
-      description: "Yes. It adheres to the WAI-ARIA design pattern.",
+      title: "Can I manage multiple teams?",
+      description:
+        "Yes. You can create multiple boards, assign teams, and manage access with role-based permissions.",
     },
   ],
-  cta: "Define your call to action",
+  cta: "Start managing sprints smarter",
   // Didn't make config for footer, idk need to improve design
 };
 

@@ -90,7 +90,9 @@ const LeftSidebar = (props: Props) => {
             height={70}
             className={cn(IsSidebarOpen ? "" : "size-14")}
           />
-          <h1 className={cn("text-xl", IsSidebarOpen ? "" : "text-base")}>
+          <h1
+            className={cn("text-xl", IsSidebarOpen ? "" : "text-base hidden")}
+          >
             {config.title}
           </h1>
         </div>

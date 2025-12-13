@@ -19,13 +19,12 @@ type NavigationLink = {
 };
 
 const navigationLinks: NavigationLink[] = [
-  { name: "Home", href: "#" },
-  { name: "Features", href: "#" },
-  { name: "Proof", href: "#" },
-  { name: "FAQ", href: "#" },
-  { name: "Contact", href: "#" },
-  { name: "Login", href: "/login", imp: true },
-  { name: "Sign Up", href: "/signup", imp: true },
+  { name: "Home", href: "#home" },
+  { name: "Features", href: "#features" },
+  { name: "Proof", href: "#proof" },
+  { name: "FAQ", href: "#faq" },
+  { name: "Login", href: "/auth/login", imp: true },
+  { name: "Sign Up", href: "/auth/signup", imp: true },
 ];
 
 const Landing = () => {
@@ -69,14 +68,14 @@ const Landing = () => {
       </div>
 
       {/* Hero Section */}
-      <div className="flex bg-test2 p-2 w-full h-[75vh]">
+      <div id="home" className="flex bg-test2 p-2 w-full h-[75vh]">
         <section className="flex sm:flex-row flex-col justify-around items-center gap-5 sm:gap-10 px-10 sm:px-16 w-full h-full section">
           {/* Left Text and CTA */}
           <div className="flex flex-col justify-center items-start gap-3 w-full sm:w-1/3 md:w-1/2 lg:w-1/3 translate-y-8 sm:-translate-y-8">
             <h1 className="font-bold text-gray-800 text-3xl md:text-5xl">
               {config.moat}
             </h1>
-            <p className="text-gray-600 text-lg md:text-xl">
+            <p className="text-gray-600 text-lg md:text-xl mt-3">
               {config.description}
             </p>
             <Link
@@ -101,10 +100,10 @@ const Landing = () => {
       </div>
 
       {/* Features */}
-      <div className="flex flex-col p-2 w-full">
+      <div id="features" className="flex flex-col p-2 w-full ">
         <section className="flex flex-col items-center gap-5 my-6 w-full h-full section">
           {/* Hook to scroll */}
-          <h2 className="mt-2 mb-8 font-bold text-gray-800 text-3xl md:text-5xl">
+          <h2 className="mt-4 mb-8 font-bold text-gray-800 text-2xl md:text-5xl">
             {config.hook2Scroll}
           </h2>
           <div className="flex flex-row flex-wrap justify-around gap-6 w-full max-w-6xl">
@@ -134,7 +133,7 @@ const Landing = () => {
       </div>
 
       {/* Proof */}
-      <div className="flex bg-test1 w-full h-full">
+      {/* <div id="proof" className="flex bg-test1 w-full h-full">
         <section className="flex flex-col items-center gap-2 my-16 w-full h-full section">
           <h2 className="mb-4 py-6 font-bold text-gray-800 text-3xl md:text-5xl">
             Social Proof
@@ -144,10 +143,13 @@ const Landing = () => {
             <CardOrCarousel data={config.testimonials} />
           </div>
         </section>
-      </div>
+      </div> */}
 
       {/* FAQ */}
-      <div className="flex flex-col items-center gap-2 p-2 w-full h-full">
+      <div
+        id="faq"
+        className="flex flex-col items-center gap-2 p-2 w-full h-full"
+      >
         <section className="flex flex-col items-center gap-2 my-16 w-full h-full section">
           <h2 className="mb-4 py-6 font-bold text-gray-800 text-3xl md:text-5xl">
             Frequently Asked Questions
