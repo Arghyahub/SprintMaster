@@ -1,4 +1,4 @@
-const CACHE_NAME = "my-app-cache-v2";
+const CACHE_NAME = "my-app-cache-v3";
 
 const ASSETS_TO_CACHE = ["/screen-loader/splash-screen-vid.mp4"];
 
